@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anamorpher - Image Downsampling Comparison</title>
+    <link rel="stylesheet" href="styles.css">
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Anamorpher</h1>
+            <p>Compare image downsampling methods & generate adversarial images</p>
+            <nav class="nav-tabs">
+                <button class="nav-tab active" data-tab="downsampling">Downsampling</button>
+                <button class="nav-tab" data-tab="adversarial">Adversarial Generator</button>
+            </nav>
+        </header>
+
+        <main>
+            <!-- Downsampling Tab -->
+            <div id="downsampling-tab" class="tab-content active">
+                <div class="controls">
+                    <div class="image-selection-section">
+                        <div class="button-row">
+                            <label for="imageInput" class="upload-btn">
+                                Upload Image (square, divisible by 4)
+                                <input type="file" id="imageInput" accept="image/*" style="display: none;">
+                            </label>
+                            
+                            <span class="or-divider">or</span>
+                            
+                            <div class="demo-button-container" style="position: relative;">
+                                <button class="upload-btn" id="demoButton" type="button">
+                                    Choose from Demos
+                                </button>
+                                <div class="demo-dropdown" id="demoDropdown">
+                                    <!-- Demo options will be populated here -->
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="upload-info">
+                            <span id="uploadStatus">No image selected</span>
+                        </div>
+                        
+                        <div class="demo-preview" id="demoPreview" style="display: none; margin-top: 1rem; text-align: center;">
+                            <img id="demoPreviewImg" alt="Demo preview" style="max-width: 200px; max-height: 200px; border: 2px solid #666; border-radius: 4px;">
+                        </div>
+                    </div>
+
+                    <div class="settings">
+                        <div class="setting-group">
+                            <label for="downsamplerSelect">Downsampler:</label>
+                            <select id="downsamplerSelect">
+                                <option value="">Select downsampler...</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="methodSelect">Method:</label>
+                            <select id="methodSelect" disabled>
+                                <option value="">Select method...</option>
+                            </select>
+                        </div>
+
+
+                        <button id="processBtn" disabled>Process Image</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Adversarial Generator Tab -->
+            <div id="adversarial-tab" class="tab-content">
+                <div class="controls">
+                    <div class="text-section">
+                        <h3>Target Text Configuration</h3>
+                        <div class="setting-group">
+                            <label for="targetText">Text to embed:</label>
+                            <input type="text" id="targetText" placeholder="Enter text to embed" value="Sample Text">
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="fontSizeInput">Font Size:</label>
+                            <select id="fontSizeInput">
+                                <option value="20">20pt</option>
+                                <option value="24">24pt</option>
+                                <option value="28">28pt</option>
+                                <option value="32" selected>32pt</option>
+                                <option value="36">36pt</option>
+                                <option value="40">40pt</option>
+                                <option value="48">48pt</option>
+                                <option value="56">56pt</option>
+                                <option value="64">64pt</option>
+                            </select>
+                        </div>
+                        
+                        <div class="setting-group">
+                            <label for="textAlignInput">Text Alignment:</label>
+                            <select id="textAlignInput">
+                                <option value="center" selected>Center</option>
+                                <option value="top">Top</option>
+                                <option value="bottom">Bottom</option>
+                                <option value="left">Left</option>
+                                <option value="right">Right</option>
+                                <option value="top-left">Top Left</option>
+                                <option value="top-right">Top Right</option>
+                                <option value="bottom-left">Bottom Left</option>
+                                <option value="bottom-right">Bottom Right</option>
+                            </select>
+                        </div>
+                        
+                        <button id="generateTextBtn">Generate Text Preview</button>
+                        <div class="text-preview" id="textPreview" style="display: none;">
+                            <img id="textPreviewImg" alt="Text preview">
+                            <div id="textWarning" class="text-warning" style="display: none;"></div>
+                        </div>
+                    </div>
+
+                    <div class="decoy-section">
+                        <h3>Decoy Image Selection</h3>
+                        <div class="setting-group">
+                            <label for="decoySelect">Decoy Image:</label>
+                            <select id="decoySelect">
+                                <option value="">Select decoy image...</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="adversarial-settings">
+                        <h3>Generation Parameters</h3>
+                        <div class="setting-group">
+                            <label for="methodSelect2">Method:</label>
+                            <select id="methodSelect2">
+                                <option value="bicubic">Bicubic</option>
+                                <option value="bilinear">Bilinear</option>
+                                <option value="nearest">Nearest Neighbor</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="lamInput">Lambda (λ):</label>
+                            <input type="number" id="lamInput" step="0.01" min="0" max="10" value="0.25">
+                            <small>Mean-preservation weight</small>
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="epsInput">Epsilon (ε):</label>
+                            <input type="number" id="epsInput" step="0.01" min="0" max="1" value="0.0">
+                            <small>Null-space dither</small>
+                        </div>
+
+                        <div class="setting-group">
+                            <label for="gammaInput">Gamma:</label>
+                            <input type="number" id="gammaInput" step="0.1" min="0.1" max="3" value="1.0">
+                            <small>Target gamma pre-emphasis</small>
+                        </div>
+
+                        <div class="method-specific" id="bicubicParams">
+                            <div class="setting-group">
+                                <label for="darkFracInput">Dark Fraction:</label>
+                                <input type="number" id="darkFracInput" step="0.01" min="0" max="1" value="0.3">
+                                <small>Fraction of luma range for embedding</small>
+                            </div>
+                        </div>
+
+                        <div class="method-specific" id="bilinearParams" style="display: none;">
+                            <div class="setting-group">
+                                <label for="darkFracInputBilinear">Dark Fraction:</label>
+                                <input type="number" id="darkFracInputBilinear" step="0.01" min="0" max="1" value="0.3">
+                                <small>Fraction of luma range for embedding</small>
+                            </div>
+                        </div>
+
+                        <div class="method-specific" id="nearestParams" style="display: none;">
+                            <div class="setting-group">
+                                <label for="offsetInput">Offset:</label>
+                                <select id="offsetInput">
+                                    <option value="0">0</option>
+                                    <option value="1">1</option>
+                                    <option value="2" selected>2</option>
+                                    <option value="3">3</option>
+                                </select>
+                                <small>Pixel offset for nearest neighbor sampling</small>
+                            </div>
+                        </div>
+
+                        <button id="generateAdvBtn" disabled>Generate Adversarial Image</button>
+                    </div>
+                </div>
+            </div>
+
+            <div class="results" id="results" style="display: none;">
+                <div class="results-header">
+                    <h2>Comparison Results</h2>
+                    <div class="metadata" id="metadata"></div>
+                </div>
+
+                <div class="comparison-container">
+                    <div class="image-comparison">
+                        <div class="comparison-slider">
+                            <div class="image-container">
+                                <img id="originalImage" class="comparison-image original" alt="Original">
+                                <img id="downsampledImage" class="comparison-image downsampled" alt="Downsampled">
+                                <div class="slider-handle" id="sliderHandle"></div>
+                            </div>
+                            <input type="range" id="comparisonSlider" min="0" max="100" value="50" class="slider">
+                        </div>
+                    </div>
+
+                    <div class="labels">
+                        <div class="label downsampled-label">Downsampled</div>
+                        <div class="label original-label">Original</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="adversarial-results" id="adversarialResults" style="display: none;">
+                <div class="results-header">
+                    <h2>Adversarial Image Results</h2>
+                    <div class="metadata" id="advMetadata"></div>
+                </div>
+                
+                <div class="adversarial-images">
+                    <div class="image-grid">
+                        <div class="image-item">
+                            <h4>Original Decoy</h4>
+                            <img id="originalDecoy" alt="Original Decoy">
+                        </div>
+                        <div class="image-item">
+                            <h4>Target Text</h4>
+                            <img id="targetImage" alt="Target Text">
+                        </div>
+                        <div class="image-item">
+                            <h4>Adversarial Result</h4>
+                            <img id="adversarialImage" alt="Adversarial Image">
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="loading" id="loading" style="display: none;">
+                <div class="spinner"></div>
+                <p>Processing image...</p>
+            </div>
+
+            <div class="error" id="error" style="display: none;">
+                <p id="errorMessage"></p>
+            </div>
+        </main>
+    </div>
+
+    <script src="script.js"></script>
+</body>
+</html>
