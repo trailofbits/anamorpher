@@ -1,6 +1,6 @@
 # Anamorpher
 
-Anamorpher (named after [anamorphosis](https://en.wikipedia.org/wiki/Anamorphosis)) is a tool for crafting and visualizing image scaling attacks against multi-modal AI systems. It provides a frontend interface and Python API for generating images that only reveal multi-modal prompt injections when downscaled. 
+Anamorpher (named after [anamorphosis](https://en.wikipedia.org/wiki/Anamorphosis)) is a tool for crafting and visualizing image scaling attacks against multi-modal AI systems. It provides a frontend interface and Python API for generating images that only reveal multi-modal prompt injections when downscaled. Refer to ["Weaponizing image scaling against production AI systems"](https://blog.trailofbits.com/2025/08/21/weaponizing-image-scaling-against-production-ai-systems/) for more information on this attack vector. 
 
 Anamorpher is in active beta development. We welcome feedback and contributions!
 
@@ -67,5 +67,6 @@ This project can also be run with `uv`.
 - [Suha Sabi Hussain](https://github.com/suhacker1)
 
 ## References
+- [**Weaponizing image scaling against production AI systems**](https://blog.trailofbits.com/2025/08/21/weaponizing-image-scaling-against-production-ai-systems/)
 - [**Adversarial Preprocessing: Understanding and Preventing Image-Scaling Attacks in Machine Learning**](https://www.usenix.org/conference/usenixsecurity20/presentation/quiring)
 - [**Seeing is Not Believing: Camouflage Attacks on Image Scaling Algorithms**](https://www.usenix.org/conference/usenixsecurity19/presentation/xiao)
