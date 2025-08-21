@@ -57,8 +57,10 @@ This project can also be run with `uv`.
 ## Warnings and Known Limitations
 
 -  Due to the probabilistic nature of these systems, results may vary. For consistent evaluation, run each example 5 times.
+-  Additional image transformations may interfere with the effectiveness of the injections. 
 -  Not all payloads will work against each implementation and parameter set of the bicubic and bilinear downscaling algorithms as a result of varying robustness of anti-aliasing across implementations, different default parameters in scaling libraries, and implementation-specific optimizations that affect interpolation behavior.
 -  This also holds true of production AI systems more broadly as system scaling behavior is subject to change.
+
 
 ## Maintainers
 - [Kikimora Morozova](https://github.com/kiki-morozova)
