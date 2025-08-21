@@ -2,18 +2,26 @@
 
 Anamorpher (named after [anamorphosis](https://en.wikipedia.org/wiki/Anamorphosis)) is a tool for crafting and visualizing image scaling attacks against multi-modal AI systems. It provides a frontend interface and Python API for generating  images that only reveal multi-modal prompt injections when downscaled. 
 
-## Demonstration
-
-![Anamorpher Demo](gemini-cli-PoC.gif)
-
-This demonstration shows a prompt injection stealthily delivered by an Anamorpher-generated image on the Gemini CLI to exfiltrate user data. Note that many systems like the one shown do not show the user a preview of the downscaled image, making this attack particularly impactful. 
+Anamorpher is currently a prototype. We welcome any suggestions and feedback you may have! 
 
 ## Features
 - Generate payloads for systems using select implementations of the bicubic, bilinear, and nearest neighbor downscaling algorithms
 - Compare payload effectiveness through a frontend interface that includes implementations from OpenCV, PyTorch, TensorFlow, and Pillow
 - Include your own custom image downscaling implementation using the modular design of the Python API
 
-Anamorpher is currently a prototype. We welcome any suggestions and feedback you may have! 
+<div align="center">
+<table>
+  <tr>
+    <td><img src="image_scaling_figure.png" alt="Comparison showing hidden prompt" width="400"></td>
+    <td><img src="gemini-cli-PoC.gif" alt="Demo of attack in action" width="400"></td>
+  </tr>
+  <tr>
+    <td align="center">Frontend Demo</td>
+    <td align="center">Gemini CLI Attack Demo</td>
+  </tr>
+</table>
+</div>
+
 
 ## Requirements
 
