@@ -1,33 +1,23 @@
 # Anamorpher
 
-A proof-of-concept tool for exploring image downscaling algorithms and generating adversarial payloads that exploit image scaling vulnerabilities in multimodal AI systems. Anamorpher demonstrates how carefully crafted images can survive downscaling operations and inject malicious content into AI model inputs.
-
-## Background
-
-Image scaling attacks exploit low sampling rates in mathematical interpolation algorithms to embed adversarial content that becomes visible after an image is downscaled. This technique has been demonstrated in several academic works:
-
-- [**Adversarial Preprocessing: Understanding and Preventing Image-Scaling Attacks in Machine Learning**](https://www.usenix.org/conference/usenixsecurity20/presentation/quiring) (USENIX Security 2020)
-- [**Seeing is Not Believing: Camouflage Attacks on Image Scaling Algorithms**](https://www.usenix.org/conference/usenixsecurity19/presentation/xiao) (USENIX Security 2019) 
-- [**Adversarial Examples for Semantic Image Segmentation and Object Detection**](https://arxiv.org/abs/2003.08633) (arXiv 2020)
-
-These attacks are particularly concerning in the context of [multimodal prompt injection](https://developer.nvidia.com/blog/how-hackers-exploit-ais-problem-solving-instincts/), where adversarial images can manipulate AI system behavior. Traditionally, such attacks were used for model backdoors, evasion, and poisoning, but by embedding text with Anamorpher, we show that they are viable vectors for prompt injection.
+Anamorpher (named after [anamorphosis](https://en.wikipedia.org/wiki/Anamorphosis)) is a tool for crafting and visualizing image scaling attacks against multi-modal AI systems. It provides a frontend interface and Python API for generating  images that only reveal multi-modal prompt injections when downscaled. 
 
 ## Demonstration
 
 ![Anamorpher Demo](gemini-cli-PoC.gif)
 
-The above demonstration shows how scaling exploits can use prompt injection to achieve data exfiltration on production systems, like gemini CLI. Note that AI systems which do not show the user a preview of the inputted image, are particularly vulnerable because the user cannot see what the model sees.
+This demonstration shows a prompt injection stealthily delivered by an Anamorpher-generated image on the Gemini CLI to exfiltrate user data. Note that many systems like the one shown do not show the user a preview of the downscaled image, making this attack particularly impactful. 
 
-## Technical Capabilities
+## Features
+- Generate payloads for systems using select implementations of the bicubic, bilinear, and nearest neighbor downscaling algorithms
+- Compare payload effectiveness through a frontend interface that includes implementations from OpenCV, PyTorch, TensorFlow, and Pillow
+- Include your own custom image downscaling implementation using the modular design of the Python API
 
-Anamorpher includes:
-- Payload generators for certain implementations of the bicubic, bilinear, and nearest neighbor downscaling algorithms
-- Web-based testing interface for comparing payload effectiveness across implementations, supporting target frameworks OpenCV, PyTorch, TensorFlow, and Pillow
-- Modular design such that when Anamorpher is run locally, it may be extended to any image downscaling implementation and algorithm
+Anamorpher is currently a prototype. We welcome any suggestions and feedback you may have! 
 
 ## Requirements
 
-- **Python 3.11** (required - torch==2.1.0 does not support Python 3.13)
+- **Python 3.11** 
 - Virtual environment recommended
 
 ## Setup
@@ -54,13 +44,18 @@ python3 app.py
 cd frontend
 # Open frontend/index.html in web browser
 ```
-This project can also be run with the `uv` python package and project manager.
+This project can also be run with `uv`.
 
-## Limitations
-The bicubic and bilinear payload generators are not effective against every implementation and parameter set. This limitation exists due to:
+## Warnings and Known Limitations
 
-- Varying robustness of anti-aliasing across implementations
-- Different default parameters in scaling libraries
-- Implementation-specific optimizations that affect interpolation behavior
+- Due to the probabilistic nature of multi-modal AI systems, results may vary. For consistent evaluation, run each example 5 times.
+- Not all payloads will work against each implementation and parameter set of the bicubic and bilinear downscaling algorithms as a result of varying robustness of anti-aliasing across implementations, different default parameters in scaling libraries, and implementation-specific optimizations that affect interpolation behavior.
+- This also holds true of production AI systems more broadly as system scaling behavior is subject to change.
 
-While we intend to develop payload generators for additional implementations, scaling algorithms change frequently. We cannot guarantee working proof-of-concepts for every popular implementation at all times.
+## Maintainers
+- [Kikimora Morozova](https://github.com/kiki-morozova)
+- [Suha Sabi Hussain](https://github.com/suhacker1)
+
+## References
+- [**Adversarial Preprocessing: Understanding and Preventing Image-Scaling Attacks in Machine Learning**](https://www.usenix.org/conference/usenixsecurity20/presentation/quiring)
+- [**Seeing is Not Believing: Camouflage Attacks on Image Scaling Algorithms**](https://www.usenix.org/conference/usenixsecurity19/presentation/xiao)
