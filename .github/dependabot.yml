@@ -3,12 +3,18 @@ updates:
   # Python dependencies
   - package-ecosystem: "uv"
     directory: "/"
+    groups:
+      python:
+        patterns:
+          - "*"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 10
     labels:
       - "dependencies"
       - "python"
+    cooldown:
+      default-days: 7
 
   # JavaScript/npm dependencies
   - package-ecosystem: "npm"
@@ -19,6 +25,8 @@ updates:
     labels:
       - "dependencies"
       - "javascript"
+    cooldown:
+      default-days: 7
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
@@ -29,3 +37,5 @@ updates:
     labels:
       - "dependencies"
       - "github-actions"
+    cooldown:
+      default-days: 7
