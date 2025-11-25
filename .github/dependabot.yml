@@ -16,21 +16,13 @@ updates:
     cooldown:
       default-days: 7
 
-  # JavaScript/npm dependencies
-  - package-ecosystem: "npm"
-    directory: "/"
-    schedule:
-      interval: "weekly"
-    open-pull-requests-limit: 10
-    labels:
-      - "dependencies"
-      - "javascript"
-    cooldown:
-      default-days: 7
-
   # GitHub Actions
   - package-ecosystem: "github-actions"
     directory: "/"
+    groups:
+      actions:
+        patterns:
+          - "*"
     schedule:
       interval: "weekly"
     open-pull-requests-limit: 5
