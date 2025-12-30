@@ -1,10 +1,10 @@
 Flask==3.0.0
 Flask-CORS==4.0.0
 opencv-python==4.8.1.78
-torch==2.1.0
-torchvision==0.16.0
-tensorflow==2.14.0
+torch==2.2.0
+torchvision==0.17.0
+tensorflow==2.16.1
 Pillow==10.1.0
-numpy==1.24.3
+numpy==1.26.4
 bleach==6.1.0
 MarkupSafe==2.1.3

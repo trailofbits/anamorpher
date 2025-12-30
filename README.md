@@ -26,14 +26,14 @@ Anamorpher is in active beta development. We welcome feedback and contributions!
 
 ## Requirements
 
-- **Python 3.11** 
+- **Python 3.11 or 3.12** 
 - Virtual environment recommended
 
 ## Setup
 
 1. Create and activate virtual environment:
 ```bash
-python3.11 -m venv venv
+python3 -m venv venv
 source venv/bin/activate  # On Windows: venv\Scripts\activate
 ```
 
