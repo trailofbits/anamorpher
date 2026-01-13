@@ -31,23 +31,17 @@ Anamorpher is in active beta development. We welcome feedback and contributions!
 
 ## Setup
 
-1. Create virtual environment and install dependencies:
+1. Install dependencies:
 ```bash
-uv venv
-source .venv/bin/activate
 uv sync
 ```
 
 2. Run backend:
 ```bash
-cd backend
-python3 app.py
+uv run python backend/app.py
 ```
 
-3. Open frontend:
-```bash
-cd frontend  # Open frontend/index.html in web browser
-```
+3. Open `frontend/index.html` in a web browser
 
 > Windows: Use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) due to TensorFlow dependencies.
 
