@@ -1,6 +1,6 @@
 # Anamorpher
 
-Anamorpher (named after [anamorphosis](https://en.wikipedia.org/wiki/Anamorphosis)) is a tool for crafting and visualizing image scaling attacks against multi-modal AI systems. It provides a frontend interface and Python API for generating images that only reveal multi-modal prompt injections when downscaled. Refer to ["Weaponizing image scaling against production AI systems"](https://blog.trailofbits.com/2025/08/21/weaponizing-image-scaling-against-production-ai-systems/) for more information on this attack vector. 
+Anamorpher (named after [anamorphosis](https://en.wikipedia.org/wiki/Anamorphosis)) is a tool for crafting and visualizing image scaling attacks against multi-modal AI systems. It provides a frontend interface and Python API for generating images that only reveal multi-modal prompt injections when downscaled. Refer to ["Weaponizing image scaling against production AI systems"](https://blog.trailofbits.com/2025/08/21/weaponizing-image-scaling-against-production-ai-systems/) for more information on this attack vector.
 
 Anamorpher is in active beta development. We welcome feedback and contributions!
 
@@ -48,7 +48,7 @@ uv run python backend/app.py
 ## Warnings and Known Limitations
 
 -  Due to the probabilistic nature of these systems, results may vary. For consistent evaluation, run each example 5 times.
--  Additional image transformations may interfere with the effectiveness of the injections. 
+-  Additional image transformations may interfere with the effectiveness of the injections.
 -  Not all payloads will work against each implementation and parameter set of the bicubic and bilinear downscaling algorithms as a result of varying robustness of anti-aliasing across implementations, different default parameters in scaling libraries, and implementation-specific optimizations that affect interpolation behavior.
 -  This also holds true of production AI systems more broadly as system scaling behavior is subject to change.
 

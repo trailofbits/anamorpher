@@ -8,12 +8,12 @@ class AnamorpherApp {
         this.decoyImages = [];
         this.demoImages = [];
         this.currentTextPreview = null;
-        
+
         this.initElements();
         this.initEventListeners();
         this.loadConfiguration();
     }
-    
+
     initElements() {
         this.elements = {
             // Downsampling elements
@@ -69,7 +69,7 @@ class AnamorpherApp {
             demoPreviewImg: document.getElementById('demoPreviewImg')
         };
     }
-    
+
     initEventListeners() {
         // Downsampling tab listeners
         this.elements.imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
@@ -77,7 +77,7 @@ class AnamorpherApp {
         this.elements.methodSelect.addEventListener('change', () => this.updateProcessButton());
         this.elements.processBtn.addEventListener('click', () => this.processImage());
         this.elements.comparisonSlider.addEventListener('input', (e) => this.updateComparison(e));
-        
+
         // Adversarial tab listeners
         this.elements.generateTextBtn.addEventListener('click', () => this.generateTextPreview());
         this.elements.generateAdvBtn.addEventListener('click', () => this.generateAdversarial());
@@ -94,43 +94,43 @@ class AnamorpherApp {
 
         // Demo image selection
         this.elements.demoButton.addEventListener('click', (e) => this.toggleDemoDropdown(e));
-        
+
         // Close dropdown when clicking outside
         document.addEventListener('click', (e) => {
             if (!e.target.closest('.demo-button-container')) {
                 this.closeDemoDropdown();
             }
         });
-        
+
         // Add mouse event listeners for draggable slider handle
         this.initSliderDrag();
     }
-    
+
     initSliderDrag() {
         let isDragging = false;
-        
+
         const handleMouseMove = (e) => {
             if (!isDragging) return;
-            
+
             const imageContainer = document.querySelector('.image-container');
             if (!imageContainer) return;
-            
+
             const rect = imageContainer.getBoundingClientRect();
             const x = e.clientX - rect.left;
             const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-            
+
             // Update the slider value and trigger comparison update
             this.elements.comparisonSlider.value = percentage;
             this.updateComparison({ target: { value: percentage } });
         };
-        
+
         const handleMouseUp = () => {
             isDragging = false;
             document.removeEventListener('mousemove', handleMouseMove);
             document.removeEventListener('mouseup', handleMouseUp);
             document.body.style.cursor = '';
         };
-        
+
         // Add mousedown event to slider handle
         this.elements.sliderHandle.addEventListener('mousedown', (e) => {
             e.preventDefault();
@@ -139,32 +139,32 @@ class AnamorpherApp {
             document.addEventListener('mousemove', handleMouseMove);
             document.addEventListener('mouseup', handleMouseUp);
         });
-        
+
         // Image container click will be added in showResults when container exists
     }
-    
+
     async loadConfiguration() {
         try {
             // Load downsamplers
             const downsamplersResponse = await fetch(`${this.baseURL}/api/downsamplers`);
             this.downsamplers = await downsamplersResponse.json();
             this.populateDownsamplers();
-            
+
 
             // Load decoy images
             await this.loadDecoyImages();
 
             // Load demo images
             await this.loadDemoImages();
-            
+
         } catch (error) {
             this.showError('Failed to load configuration. Make sure the backend server is running.');
         }
     }
-    
+
     populateDownsamplers() {
         this.elements.downsamplerSelect.innerHTML = '<option value="">Select downsampler...</option>';
-        
+
         for (const [key, downsampler] of Object.entries(this.downsamplers)) {
             const option = document.createElement('option');
             option.value = key;
@@ -172,8 +172,8 @@ class AnamorpherApp {
             this.elements.downsamplerSelect.appendChild(option);
         }
     }
-    
-    
+
+
     handleImageUpload(event) {
         const file = event.target.files[0];
         if (!file) {
@@ -183,13 +183,13 @@ class AnamorpherApp {
             this.updateProcessButton();
             return;
         }
-        
+
         // Validate file type
         if (!file.type.startsWith('image/')) {
             this.showError('Please select a valid image file.');
             return;
         }
-        
+
         const reader = new FileReader();
         reader.onload = (e) => {
             const img = new Image();
@@ -209,15 +209,15 @@ class AnamorpherApp {
                     this.elements.uploadStatus.textContent = 'Invalid image dimensions';
                     return;
                 }
-                
+
                 this.currentImage = e.target.result;
                 this.currentImageDimensions = { width: img.width, height: img.height };
                 const targetResolution = img.width / 4;
                 this.elements.uploadStatus.textContent = `${file.name} (${img.width}x${img.height} → ${targetResolution}x${targetResolution})`;
-                
+
                 // Hide demo preview when file is uploaded
                 this.elements.demoPreview.style.display = 'none';
-                
+
                 this.hideError();
                 this.updateProcessButton();
             };
@@ -225,14 +225,14 @@ class AnamorpherApp {
         };
         reader.readAsDataURL(file);
     }
-    
+
     handleDownsamplerChange(event) {
         const selectedDownsampler = event.target.value;
-        
+
         // Clear and disable method select
         this.elements.methodSelect.innerHTML = '<option value="">Select method...</option>';
         this.elements.methodSelect.disabled = !selectedDownsampler;
-        
+
         if (selectedDownsampler && this.downsamplers[selectedDownsampler]) {
             // Populate methods for selected downsampler
             const methods = this.downsamplers[selectedDownsampler].methods;
@@ -244,15 +244,15 @@ class AnamorpherApp {
             });
             this.elements.methodSelect.disabled = false;
         }
-        
+
         this.updateProcessButton();
     }
-    
+
     updateProcessButton() {
         const hasImage = this.currentImage !== null;
         const hasDownsampler = this.elements.downsamplerSelect.value !== '';
         const hasMethod = this.elements.methodSelect.value !== '';
-        
+
         this.elements.processBtn.disabled = !(hasImage && hasDownsampler && hasMethod);
     }
 
@@ -288,7 +288,7 @@ class AnamorpherApp {
 
     populateDemoImages() {
         this.elements.demoDropdown.innerHTML = '';
-        
+
         this.demoImages.forEach(demo => {
             const option = document.createElement('div');
             option.className = 'demo-option';
@@ -325,25 +325,25 @@ class AnamorpherApp {
         try {
             this.showLoading();
             const response = await fetch(`${this.baseURL}/api/demo-images/${filename}`);
-            
+
             if (!response.ok) {
                 throw new Error('Failed to load demo image');
             }
-            
+
             const result = await response.json();
-            
+
             // Set current image data
             this.currentImage = result.image;
             this.currentImageDimensions = { width: result.width, height: result.height };
-            
+
             // Clear file input when demo is selected
             this.elements.imageInput.value = '';
-            
+
             // Show preview and update status
             this.elements.demoPreviewImg.src = result.image;
             this.elements.demoPreview.style.display = 'block';
             this.elements.uploadStatus.textContent = `${filename} (${result.width}x${result.height} → ${result.width/4}x${result.height/4})`;
-            
+
             // Update process button
             this.updateProcessButton();
             this.hideError();
@@ -378,18 +378,18 @@ class AnamorpherApp {
             this.hideLoading();
         }
     }
-    
+
     async processImage() {
         if (!this.currentImage) return;
-        
+
         const downsampler = this.elements.downsamplerSelect.value;
         const method = this.elements.methodSelect.value;
         const targetResolution = this.currentImageDimensions.width / 4;
-        
+
         this.showLoading();
         this.hideError();
         this.hideResults();
-        
+
         try {
             const response = await fetch(`${this.baseURL}/api/downsample`, {
                 method: 'POST',
@@ -403,38 +403,38 @@ class AnamorpherApp {
                     target_resolution: targetResolution
                 })
             });
-            
+
             if (!response.ok) {
                 const errorData = await response.json();
                 throw new Error(errorData.error || 'Processing failed');
             }
-            
+
             const result = await response.json();
             this.showResults(result);
-            
+
         } catch (error) {
             this.showError(`Processing failed: ${error.message}`);
         } finally {
             this.hideLoading();
         }
     }
-    
+
     showResults(result) {
         // Update metadata
         this.elements.metadata.innerHTML = `<strong>${result.downsampler}</strong> - ${result.method}<br>Original: ${result.original_size} → Downsampled: ${result.downsampled_size}`;
-        
+
         // Update images
         this.elements.originalImage.src = result.original;
         this.elements.downsampledImage.src = result.downsampled;
-        
+
         // Update labels
         document.querySelector('.downsampled-label').textContent = `Downsampled (${result.downsampled_size})`;
         document.querySelector('.original-label').textContent = `Original (${result.original_size})`;
-        
+
         // Reset comparison slider
         this.elements.comparisonSlider.value = 50;
         this.updateComparison({ target: { value: 50 } });
-        
+
         // Add click event to image container for direct positioning
         setTimeout(() => {
             const imageContainer = document.querySelector('.image-container');
@@ -443,45 +443,45 @@ class AnamorpherApp {
                     const rect = imageContainer.getBoundingClientRect();
                     const x = e.clientX - rect.left;
                     const percentage = Math.max(0, Math.min(100, (x / rect.width) * 100));
-                    
+
                     this.elements.comparisonSlider.value = percentage;
                     this.updateComparison({ target: { value: percentage } });
                 });
             }
         }, 100);
-        
+
         // Show results
         this.elements.results.style.display = 'block';
     }
-    
+
     updateComparison(event) {
         const value = event.target.value;
         const percentage = 100 - value; // Invert the value so 0 shows original, 100 shows downsampled
-        
+
         // Update downsampled image clip-path
         this.elements.downsampledImage.style.clipPath = `inset(0 ${percentage}% 0 0)`;
-        
+
         // Update slider handle position
         this.elements.sliderHandle.style.left = `${value}%`;
     }
-    
+
     showLoading() {
         this.elements.loading.style.display = 'block';
     }
-    
+
     hideLoading() {
         this.elements.loading.style.display = 'none';
     }
-    
+
     hideResults() {
         this.elements.results.style.display = 'none';
     }
-    
+
     showError(message) {
         this.elements.errorMessage.textContent = message;
         this.elements.error.style.display = 'block';
     }
-    
+
     hideError() {
         this.elements.error.style.display = 'none';
     }
@@ -489,12 +489,12 @@ class AnamorpherApp {
     // Tab switching
     switchTab(tabName) {
         this.currentTab = tabName;
-        
+
         // Update nav tabs
         this.elements.navTabs.forEach(tab => {
             tab.classList.toggle('active', tab.dataset.tab === tabName);
         });
-        
+
         // Update tab content
         this.elements.tabContents.forEach(content => {
             content.classList.toggle('active', content.id === `${tabName}-tab`);
@@ -518,7 +518,7 @@ class AnamorpherApp {
 
     populateDecoyImages() {
         this.elements.decoySelect.innerHTML = '<option value="">Select decoy image...</option>';
-        
+
         this.decoyImages.forEach(decoy => {
             const option = document.createElement('option');
             option.value = decoy.filename;
@@ -537,10 +537,10 @@ class AnamorpherApp {
 
         try {
             this.showLoading();
-            
+
             const fontSize = parseInt(this.elements.fontSizeInput.value);
             const alignment = this.elements.textAlignInput.value;
-            
+
             const response = await fetch(`${this.baseURL}/api/generate-text-image`, {
                 method: 'POST',
                 headers: {
@@ -563,7 +563,7 @@ class AnamorpherApp {
             this.currentTextPreview = result.image;
             this.elements.textPreviewImg.src = result.image;
             this.elements.textPreview.style.display = 'block';
-            
+
             // Show warning if text overflowed
             if (result.text_overflowed) {
                 this.elements.textWarning.textContent = 'Warning: Text is too large and may be cut off in the image.';
@@ -572,7 +572,7 @@ class AnamorpherApp {
             } else {
                 this.elements.textWarning.style.display = 'none';
             }
-            
+
             this.updateGenerateAdvButton();
 
         } catch (error) {
@@ -585,12 +585,12 @@ class AnamorpherApp {
     // Handle method change for adversarial generation
     handleMethodChange(event) {
         const method = event.target.value;
-        
+
         // Hide all method-specific parameters first
         this.elements.bicubicParams.style.display = 'none';
         this.elements.bilinearParams.style.display = 'none';
         this.elements.nearestParams.style.display = 'none';
-        
+
         // Update default values based on method
         if (method === 'bicubic') {
             this.elements.bicubicParams.style.display = 'block';
@@ -614,7 +614,7 @@ class AnamorpherApp {
     updateGenerateAdvButton() {
         const hasText = this.elements.targetText.value.trim() !== '';
         const hasDecoy = this.elements.decoySelect.value !== '';
-        
+
         this.elements.generateAdvBtn.disabled = !(hasText && hasDecoy);
     }
 
@@ -622,7 +622,7 @@ class AnamorpherApp {
     async generateAdversarial() {
         const text = this.elements.targetText.value.trim();
         const decoyFilename = this.elements.decoySelect.value;
-        
+
         if (!text || !decoyFilename) {
             this.showError('Please enter text and select a decoy image');
             return;
@@ -632,7 +632,7 @@ class AnamorpherApp {
             this.showLoading();
             this.hideError();
             this.hideAdversarialResults();
-            
+
             const method = this.elements.methodSelect2.value;
             const requestData = {
                 method: method,
@@ -684,7 +684,7 @@ class AnamorpherApp {
         let paramStr = `λ=${params.lam}, ε=${params.eps}, γ=${params.gamma}`;
         if (params.offset !== null) paramStr += `, offset=${params.offset}`;
         if (params.dark_frac !== null) paramStr += `, dark_frac=${params.dark_frac}`;
-        
+
         this.elements.advMetadata.innerHTML = `<strong>Method:</strong> ${result.method}<br><strong>Text:</strong> "${result.text}"<br><strong>Decoy:</strong> ${result.decoy_filename}<br><strong>Parameters:</strong> ${paramStr}`;
 
         // Update images
