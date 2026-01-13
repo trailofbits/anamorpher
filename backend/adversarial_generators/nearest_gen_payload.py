@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 from math import log10
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -131,7 +130,7 @@ def embed_nn(
 # ---------------------------------------------------------------------------
 # Metrics
 
-def mse_psnr(a: ImageF32, b: ImageF32) -> Tuple[float, float]:
+def mse_psnr(a: ImageF32, b: ImageF32) -> tuple[float, float]:
     """
     Mean squared error and PSNR (peak = 1.0) between two linear-light images.
     """

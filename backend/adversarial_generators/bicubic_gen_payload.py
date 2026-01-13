@@ -2,7 +2,6 @@ from __future__ import annotations
 
 import argparse
 from math import log10
-from typing import Tuple
 
 import numpy as np
 import numpy.typing as npt
@@ -55,7 +54,7 @@ def bottom_luma_mask(img: ImageF32, frac: float = 0.3) -> npt.NDArray[np.bool_]:
     y_min = float(Y.min())
     y_max = float(Y.max())
     thresh = y_min + frac * (y_max - y_min)
-    return (Y <= thresh)
+    return (thresh >= Y)
 
 def embed(
     decoy: ImageF32,
@@ -135,7 +134,7 @@ def embed(
 
     return adv.astype(np.float32)
 
-def mse_psnr(a: ImageF32, b: ImageF32) -> Tuple[float, float]:
+def mse_psnr(a: ImageF32, b: ImageF32) -> tuple[float, float]:
     mse = float(np.mean((a - b) ** 2))
     psnr = float("inf") if mse == 0 else 10.0 * log10(1.0 / mse)
     return mse, psnr
