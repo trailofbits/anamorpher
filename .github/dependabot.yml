@@ -1,0 +1,33 @@
+version: 2
+updates:
+  # Python dependencies
+  - package-ecosystem: "uv"
+    directory: "/"
+    groups:
+      python:
+        patterns:
+          - "*"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 10
+    labels:
+      - "dependencies"
+      - "python"
+    cooldown:
+      default-days: 7
+
+  # GitHub Actions
+  - package-ecosystem: "github-actions"
+    directory: "/"
+    groups:
+      actions:
+        patterns:
+          - "*"
+    schedule:
+      interval: "weekly"
+    open-pull-requests-limit: 5
+    labels:
+      - "dependencies"
+      - "github-actions"
+    cooldown:
+      default-days: 7
