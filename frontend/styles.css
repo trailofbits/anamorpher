@@ -301,6 +301,7 @@ select option {
     color: #b0b0b0;
     font-size: 0.9rem;
     font-family: 'SF Mono', monospace;
+    text-align: center;
     word-wrap: break-word;
     word-break: break-word;
     white-space: pre-wrap;
