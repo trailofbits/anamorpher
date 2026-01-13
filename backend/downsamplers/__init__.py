@@ -1,12 +1,12 @@
 from .base import BaseDownsampler
 from .opencv_downsampler import OpenCVDownsampler
+from .pillow_downsampler import PillowDownsampler
 from .pytorch_downsampler import PyTorchDownsampler
 from .tensorflow_downsampler import TensorFlowDownsampler
-from .pillow_downsampler import PillowDownsampler
 
 __all__ = [
     'BaseDownsampler',
-    'OpenCVDownsampler', 
+    'OpenCVDownsampler',
     'PyTorchDownsampler',
     'TensorFlowDownsampler',
     'PillowDownsampler'

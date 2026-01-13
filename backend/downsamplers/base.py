@@ -1,9 +1,11 @@
 from abc import ABC, abstractmethod
+
 import numpy as np
+
 
 class BaseDownsampler(ABC):
     """Base class for all downsamplers"""
-    
+
     @abstractmethod
     def downsample(self, image: np.ndarray, target_size: tuple, method: str) -> np.ndarray:
         """
@@ -18,12 +20,12 @@ class BaseDownsampler(ABC):
             Downsampled image as numpy array
         """
         pass
-    
+
     @abstractmethod
     def get_supported_methods(self) -> list:
         """Return list of supported interpolation methods"""
         pass
-    
+
     @property
     @abstractmethod
     def name(self) -> str:

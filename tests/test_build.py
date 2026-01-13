@@ -35,9 +35,11 @@ def test_imports():
 
     try:
         import app
-        from adversarial_generators import bicubic_gen_payload
-        from adversarial_generators import bilinear_gen_payload
-        from adversarial_generators import nearest_gen_payload
+        from adversarial_generators import (
+            bicubic_gen_payload,
+            bilinear_gen_payload,
+            nearest_gen_payload,
+        )
 
         if (backend_path / "sanitizer.py").exists():
             import sanitizer
@@ -51,15 +53,15 @@ def test_imports():
 def test_package_installation():
     """Test that core packages can be imported"""
     try:
-        import numpy
-        import PIL
+        import bleach
         import cv2
-        import torch
-        import tensorflow
         import flask
         import flask_cors
-        import bleach
         import markupsafe
+        import numpy
+        import PIL
+        import tensorflow
+        import torch
     except ImportError as e:
         assert False, f"Required package import failed: {e}"
 
