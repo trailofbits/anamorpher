@@ -26,7 +26,7 @@ Anamorpher is in active beta development. We welcome feedback and contributions!
 
 ## Requirements
 
-- **Python 3.11** 
+- Python 3.9, 3.10, 3.11, 3.12, or 3.13
 - Virtual environment recommended
 
 ## Setup
