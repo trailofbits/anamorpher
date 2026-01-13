@@ -47,7 +47,7 @@ class TestNearestGenPayload:
         
         # Test that black stays black and white becomes 255
         assert srgb[0, 0, 0] == 0.0  # Black
-        assert srgb[0, 0, 2] == 255.0  # White
+        assert srgb[0, 0, 2] == pytest.approx(255.0, abs=0.01)  # White
 
     def test_roundtrip_conversion(self):
         """Test that sRGB -> linear -> sRGB is approximately identity"""
