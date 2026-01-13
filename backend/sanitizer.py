@@ -143,7 +143,7 @@ def sanitize_numeric(
             value = value.strip()
 
         # Convert to target type
-        if data_type == int:
+        if data_type is int:
             result = int(float(value))  # Convert via float to handle "1.0" strings
         else:
             result = float(value)
@@ -222,7 +222,7 @@ def validate_safe_path(file_path: str, allowed_base_dir: str) -> str:
         real_file_path = os.path.realpath(abs_file_path)
         real_base_dir = os.path.realpath(abs_base_dir)
     except OSError:
-        raise ValueError("Invalid path")
+        raise ValueError("Invalid path") from None
 
     # Check if the real file path is within the real base directory
     if not real_file_path.startswith(real_base_dir + os.sep):

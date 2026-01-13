@@ -32,7 +32,7 @@ BILINEAR_SCRIPT_PATH = os.getenv(
     "BILINEAR_SCRIPT_PATH", "adversarial_generators/bilinear_gen_payload.py"
 )
 
-from downsamplers import (
+from downsamplers import (  # noqa: E402
     OpenCVDownsampler,
     PillowDownsampler,
     PyTorchDownsampler,
@@ -109,7 +109,7 @@ def base64_to_image(base64_string: str) -> np.ndarray:
     except Exception as e:
         if isinstance(e, ValueError):
             raise
-        raise ValueError(f"Failed to decode image: {str(e)}")
+        raise ValueError(f"Failed to decode image: {str(e)}") from e
 
 
 @app.route("/api/downsamplers", methods=["GET"])

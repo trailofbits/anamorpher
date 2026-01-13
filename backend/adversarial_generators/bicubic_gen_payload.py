@@ -78,7 +78,6 @@ def embed(
     """
     s = 4
     w_full: VecF32 = weight_vector(s)
-    sum_w_full = float(w_full.sum())  # used only for y_cur; solver re-computes per-subset
 
     # Precompute where edits are allowed based on original decoy luma
     editable_mask = bottom_luma_mask(decoy, frac=dark_frac)
