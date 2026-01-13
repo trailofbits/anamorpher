@@ -474,10 +474,14 @@ def generate_adversarial():
         raw_method = data.get('method', 'bicubic')
         raw_text = data.get('text', 'Sample Text')
         raw_decoy_filename = data.get('decoy_filename')
-        
+        raw_font_size = data.get('font_size', 32)
+        raw_alignment = data.get('alignment', 'center')
+
         # Sanitize basic parameters
         method = sanitize_method(raw_method)
         text = sanitize_text(raw_text)
+        font_size = sanitize_numeric(raw_font_size, min_val=20, max_val=64, data_type=int)
+        alignment = sanitize_alignment(raw_alignment)
         
         if not raw_decoy_filename:
             return jsonify({'error': 'Decoy filename is required'}), 400
@@ -520,8 +524,8 @@ def generate_adversarial():
         if target_size <= 0 or decoy_info['width'] % 4 != 0:
             return jsonify({'error': 'Decoy image width must be divisible by 4'}), 400
         
-        # Generate target text image (use default font size and alignment for adversarial generation)
-        target_image, _ = create_text_image(text, target_size)
+        # Generate target text image with user-specified font size and alignment
+        target_image, _ = create_text_image(text, target_size, font_size, alignment)
         
         # Create temporary files for processing
         with tempfile.TemporaryDirectory() as temp_dir:

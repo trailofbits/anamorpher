@@ -74,6 +74,7 @@ class AnamorpherApp {
         // Downsampling tab listeners
         this.elements.imageInput.addEventListener('change', (e) => this.handleImageUpload(e));
         this.elements.downsamplerSelect.addEventListener('change', (e) => this.handleDownsamplerChange(e));
+        this.elements.methodSelect.addEventListener('change', () => this.updateProcessButton());
         this.elements.processBtn.addEventListener('click', () => this.processImage());
         this.elements.comparisonSlider.addEventListener('input', (e) => this.updateComparison(e));
         
@@ -298,10 +299,16 @@ class AnamorpherApp {
         });
     }
 
-    selectDemoImage(event) {
+    // Extract method name from demo filename (e.g., "nearest_demo.png" -> "nearest")
+    getDemoMethod(filename) {
+        const match = filename.match(/^(nearest|bilinear|bicubic)_demo\.png$/i);
+        return match ? match[1].toLowerCase() : null;
+    }
+
+    async selectDemoImage(event) {
         const filename = event.target.dataset.filename;
         this.closeDemoDropdown();
-        this.loadDemoImage(filename);
+        await this.loadDemoImage(filename);
     }
 
     // Load selected demo image
@@ -340,7 +347,27 @@ class AnamorpherApp {
             // Update process button
             this.updateProcessButton();
             this.hideError();
-            
+
+            // Auto-process if this is a recognized demo image
+            const method = this.getDemoMethod(filename);
+            if (method) {
+                // Set downsampler: tensorflow for nearest, opencv for bilinear/bicubic
+                const downsampler = method === 'nearest' ? 'tensorflow' : 'opencv';
+                this.elements.downsamplerSelect.value = downsampler;
+                // Trigger change event to populate methods dropdown
+                const event = new Event('change');
+                this.elements.downsamplerSelect.dispatchEvent(event);
+
+                // Wait for dropdown to populate
+                await new Promise(resolve => setTimeout(resolve, 100));
+
+                // Set method
+                this.elements.methodSelect.value = method;
+
+                // Process automatically
+                await this.processImage();
+            }
+
         } catch (error) {
             this.showError(`Failed to load demo image: ${error.message}`);
             this.currentImage = null;
@@ -394,10 +421,7 @@ class AnamorpherApp {
     
     showResults(result) {
         // Update metadata
-        this.elements.metadata.innerHTML = `
-            <strong>${result.downsampler}</strong> - ${result.method}<br>
-            Original: ${result.original_size} → Downsampled: ${result.downsampled_size}
-        `;
+        this.elements.metadata.innerHTML = `<strong>${result.downsampler}</strong> - ${result.method}<br>Original: ${result.original_size} → Downsampled: ${result.downsampled_size}`;
         
         // Update images
         this.elements.originalImage.src = result.original;
@@ -614,6 +638,8 @@ class AnamorpherApp {
                 method: method,
                 text: text,
                 decoy_filename: decoyFilename,
+                font_size: parseInt(this.elements.fontSizeInput.value),
+                alignment: this.elements.textAlignInput.value,
                 lam: parseFloat(this.elements.lamInput.value),
                 eps: parseFloat(this.elements.epsInput.value),
                 gamma: parseFloat(this.elements.gammaInput.value)
@@ -659,12 +685,7 @@ class AnamorpherApp {
         if (params.offset !== null) paramStr += `, offset=${params.offset}`;
         if (params.dark_frac !== null) paramStr += `, dark_frac=${params.dark_frac}`;
         
-        this.elements.advMetadata.innerHTML = `
-            <strong>Method:</strong> ${result.method}<br>
-            <strong>Text:</strong> "${result.text}"<br>
-            <strong>Decoy:</strong> ${result.decoy_filename}<br>
-            <strong>Parameters:</strong> ${paramStr}
-        `;
+        this.elements.advMetadata.innerHTML = `<strong>Method:</strong> ${result.method}<br><strong>Text:</strong> "${result.text}"<br><strong>Decoy:</strong> ${result.decoy_filename}<br><strong>Parameters:</strong> ${paramStr}`;
 
         // Update images
         this.elements.originalDecoy.src = result.original_decoy;
