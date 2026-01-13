@@ -10,12 +10,12 @@ class BaseDownsampler(ABC):
     def downsample(self, image: np.ndarray, target_size: tuple, method: str) -> np.ndarray:
         """
         Downsample an image to target size using specified method
-        
+
         Args:
             image: Input image as numpy array (H, W, C)
             target_size: Target size as (width, height)
             method: Interpolation method ('bilinear', 'bicubic', 'nearest')
-            
+
         Returns:
             Downsampled image as numpy array
         """

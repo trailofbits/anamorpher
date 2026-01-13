@@ -9,9 +9,9 @@ class TensorFlowDownsampler(BaseDownsampler):
 
     def __init__(self):
         self._method_map = {
-            'nearest': tf.image.ResizeMethod.NEAREST_NEIGHBOR,
-            'bilinear': tf.image.ResizeMethod.BILINEAR,
-            'bicubic': tf.image.ResizeMethod.BICUBIC
+            "nearest": tf.image.ResizeMethod.NEAREST_NEIGHBOR,
+            "bilinear": tf.image.ResizeMethod.BILINEAR,
+            "bicubic": tf.image.ResizeMethod.BICUBIC,
         }
 
     @property
@@ -24,7 +24,7 @@ class TensorFlowDownsampler(BaseDownsampler):
     def downsample(self, image: np.ndarray, target_size: tuple, method: str) -> np.ndarray:
         """
         Downsample using TensorFlow resize
-        
+
         Args:
             image: Input image (H, W, C)
             target_size: (width, height)

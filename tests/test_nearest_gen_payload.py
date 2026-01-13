@@ -17,15 +17,15 @@ class TestNearestGenPayload:
 
     def test_module_imports(self):
         """Test that all required functions are importable"""
-        assert hasattr(nearest_gen_payload, 'srgb2lin')
-        assert hasattr(nearest_gen_payload, 'lin2srgb')
-        assert hasattr(nearest_gen_payload, 'embed_nn')
-        assert hasattr(nearest_gen_payload, 'mse_psnr')
-        assert hasattr(nearest_gen_payload, 'main')
+        assert hasattr(nearest_gen_payload, "srgb2lin")
+        assert hasattr(nearest_gen_payload, "lin2srgb")
+        assert hasattr(nearest_gen_payload, "embed_nn")
+        assert hasattr(nearest_gen_payload, "mse_psnr")
+        assert hasattr(nearest_gen_payload, "main")
 
     def test_srgb2lin_conversion(self):
         """Test sRGB to linear conversion"""
-        srgb_values = np.array([[[0., 128., 255.]]], dtype=np.float32)
+        srgb_values = np.array([[[0.0, 128.0, 255.0]]], dtype=np.float32)
         linear = nearest_gen_payload.srgb2lin(srgb_values)
 
         assert linear.shape == srgb_values.shape
@@ -38,7 +38,7 @@ class TestNearestGenPayload:
 
     def test_lin2srgb_conversion(self):
         """Test linear to sRGB conversion"""
-        linear_values = np.array([[[0., 0.5, 1.]]], dtype=np.float32)
+        linear_values = np.array([[[0.0, 0.5, 1.0]]], dtype=np.float32)
         srgb = nearest_gen_payload.lin2srgb(linear_values)
 
         assert srgb.shape == linear_values.shape
@@ -51,7 +51,7 @@ class TestNearestGenPayload:
 
     def test_roundtrip_conversion(self):
         """Test that sRGB -> linear -> sRGB is approximately identity"""
-        srgb_values = np.array([[[64., 128., 192.]]], dtype=np.float32)
+        srgb_values = np.array([[[64.0, 128.0, 192.0]]], dtype=np.float32)
         linear = nearest_gen_payload.srgb2lin(srgb_values)
         srgb_back = nearest_gen_payload.lin2srgb(linear)
 
@@ -133,19 +133,19 @@ class TestNearestGenPayload:
         mse, psnr = nearest_gen_payload.mse_psnr(a, b)
 
         assert mse == 0.0  # Identical images should have 0 MSE
-        assert psnr == float('inf')  # And infinite PSNR
+        assert psnr == float("inf")  # And infinite PSNR
 
         # Test with different images
         b = np.ones((4, 4, 3), dtype=np.float32) * 0.6
         mse, psnr = nearest_gen_payload.mse_psnr(a, b)
 
         assert mse > 0  # Different images should have positive MSE
-        assert psnr > 0 and psnr != float('inf')  # Finite positive PSNR
+        assert psnr > 0 and psnr != float("inf")  # Finite positive PSNR
 
     def test_main_function_args(self):
         """Test that main function accepts expected arguments"""
-        with patch('sys.argv', ['nearest_gen_payload.py', '--help']):
-            with patch('argparse.ArgumentParser.parse_args') as mock_args:
+        with patch("sys.argv", ["nearest_gen_payload.py", "--help"]):
+            with patch("argparse.ArgumentParser.parse_args") as mock_args:
                 mock_args.side_effect = SystemExit  # argparse exits on --help
 
                 with pytest.raises(SystemExit):
@@ -161,10 +161,11 @@ class TestNearestGenPayload:
         mock_args.gamma = 1.0
         mock_args.offset = 2
 
-        with patch('argparse.ArgumentParser.parse_args', return_value=mock_args), \
-             patch('PIL.Image.open') as mock_open, \
-             patch('PIL.Image.fromarray') as mock_fromarray:
-
+        with (
+            patch("argparse.ArgumentParser.parse_args", return_value=mock_args),
+            patch("PIL.Image.open") as mock_open,
+            patch("PIL.Image.fromarray") as mock_fromarray,
+        ):
             # Mock image loading
             mock_img = MagicMock()
             mock_img.convert.return_value = mock_img
@@ -185,7 +186,7 @@ class TestNearestGenPayload:
 
             mock_asarray.call_count = 1
 
-            with patch('numpy.asarray', side_effect=mock_asarray):
+            with patch("numpy.asarray", side_effect=mock_asarray):
                 mock_result_img = MagicMock()
                 mock_fromarray.return_value = mock_result_img
 
@@ -208,9 +209,10 @@ class TestNearestGenPayload:
         mock_args.gamma = 1.0
         mock_args.offset = 2
 
-        with patch('argparse.ArgumentParser.parse_args', return_value=mock_args), \
-             patch('PIL.Image.open') as mock_open:
-
+        with (
+            patch("argparse.ArgumentParser.parse_args", return_value=mock_args),
+            patch("PIL.Image.open") as mock_open,
+        ):
             mock_img = MagicMock()
             mock_img.convert.return_value = mock_img
             mock_open.return_value = mock_img
@@ -228,7 +230,7 @@ class TestNearestGenPayload:
 
             mock_asarray.call_count = 1
 
-            with patch('numpy.asarray', side_effect=mock_asarray):
+            with patch("numpy.asarray", side_effect=mock_asarray):
                 with pytest.raises(AssertionError):
                     nearest_gen_payload.main()
 

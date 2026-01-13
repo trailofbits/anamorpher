@@ -19,19 +19,19 @@ class TestBilinearGenPayload:
 
     def test_module_imports(self):
         """Test that all required functions are importable"""
-        assert hasattr(bilinear_gen_payload, 'srgb2lin')
-        assert hasattr(bilinear_gen_payload, 'lin2srgb')
-        assert hasattr(bilinear_gen_payload, 'bilinear_kernel')
-        assert hasattr(bilinear_gen_payload, 'weight_vector_bilinear')
-        assert hasattr(bilinear_gen_payload, 'luma_linear')
-        assert hasattr(bilinear_gen_payload, 'bottom_luma_mask')
-        assert hasattr(bilinear_gen_payload, 'embed_bilinear')
-        assert hasattr(bilinear_gen_payload, 'mse_psnr')
-        assert hasattr(bilinear_gen_payload, 'main')
+        assert hasattr(bilinear_gen_payload, "srgb2lin")
+        assert hasattr(bilinear_gen_payload, "lin2srgb")
+        assert hasattr(bilinear_gen_payload, "bilinear_kernel")
+        assert hasattr(bilinear_gen_payload, "weight_vector_bilinear")
+        assert hasattr(bilinear_gen_payload, "luma_linear")
+        assert hasattr(bilinear_gen_payload, "bottom_luma_mask")
+        assert hasattr(bilinear_gen_payload, "embed_bilinear")
+        assert hasattr(bilinear_gen_payload, "mse_psnr")
+        assert hasattr(bilinear_gen_payload, "main")
 
     def test_srgb2lin_conversion(self):
         """Test sRGB to linear conversion"""
-        srgb_values = np.array([[[0., 128., 255.]]], dtype=np.float32)
+        srgb_values = np.array([[[0.0, 128.0, 255.0]]], dtype=np.float32)
         linear = bilinear_gen_payload.srgb2lin(srgb_values)
 
         assert linear.shape == srgb_values.shape
@@ -40,7 +40,7 @@ class TestBilinearGenPayload:
 
     def test_lin2srgb_conversion(self):
         """Test linear to sRGB conversion"""
-        linear_values = np.array([[[0., 0.5, 1.]]], dtype=np.float32)
+        linear_values = np.array([[[0.0, 0.5, 1.0]]], dtype=np.float32)
         srgb = bilinear_gen_payload.lin2srgb(linear_values)
 
         assert srgb.shape == linear_values.shape
@@ -49,7 +49,7 @@ class TestBilinearGenPayload:
 
     def test_bilinear_kernel(self):
         """Test bilinear kernel function"""
-        x = np.array([0., 0.5, 1., 1.5])
+        x = np.array([0.0, 0.5, 1.0, 1.5])
         weights = bilinear_gen_payload.bilinear_kernel(x)
 
         assert len(weights) == len(x)
@@ -85,8 +85,8 @@ class TestBilinearGenPayload:
     def test_bottom_luma_mask(self):
         """Test bottom luma mask generation"""
         rgb_img = np.zeros((4, 4, 3), dtype=np.float32)
-        rgb_img[0, 0] = [1., 1., 1.]  # Bright pixel
-        rgb_img[3, 3] = [0., 0., 0.]  # Dark pixel
+        rgb_img[0, 0] = [1.0, 1.0, 1.0]  # Bright pixel
+        rgb_img[3, 3] = [0.0, 0.0, 0.0]  # Dark pixel
 
         mask = bilinear_gen_payload.bottom_luma_mask(rgb_img, frac=0.5)
 
@@ -131,14 +131,14 @@ class TestBilinearGenPayload:
         mse, psnr = bilinear_gen_payload.mse_psnr(a, b)
 
         assert mse == 0.0
-        assert psnr == float('inf')
+        assert psnr == float("inf")
 
         # Test with different images
         b = np.ones((4, 4, 3), dtype=np.float32) * 0.6
         mse, psnr = bilinear_gen_payload.mse_psnr(a, b)
 
         assert mse > 0
-        assert psnr > 0 and psnr != float('inf')
+        assert psnr > 0 and psnr != float("inf")
 
     def test_main_function_structure(self):
         """Test main function structure without execution"""
@@ -151,12 +151,13 @@ class TestBilinearGenPayload:
         mock_args.dark_frac = 0.3
         mock_args.anti_alias = False
 
-        with patch('argparse.ArgumentParser.parse_args', return_value=mock_args), \
-             patch('cv2.imread') as mock_imread, \
-             patch('cv2.imwrite'), \
-             patch('cv2.resize') as mock_resize, \
-             patch('cv2.cvtColor') as mock_cvtcolor:
-
+        with (
+            patch("argparse.ArgumentParser.parse_args", return_value=mock_args),
+            patch("cv2.imread") as mock_imread,
+            patch("cv2.imwrite"),
+            patch("cv2.resize") as mock_resize,
+            patch("cv2.cvtColor") as mock_cvtcolor,
+        ):
             # Mock OpenCV functions
             test_array = np.random.rand(8, 8, 3).astype(np.float32)
             mock_imread.return_value = test_array
@@ -176,14 +177,14 @@ class TestBilinearGenPayload:
         # Verify the main function can parse the anti_alias argument
         # by checking argparse configuration
         with (
-            patch('sys.stderr', new_callable=StringIO),
-            patch('sys.argv', ['bilinear_gen_payload.py', '--help']),
+            patch("sys.stderr", new_callable=StringIO),
+            patch("sys.argv", ["bilinear_gen_payload.py", "--help"]),
             contextlib.suppress(SystemExit),
         ):
             bilinear_gen_payload.main()
 
         # Verify the module has the expected argument handling
-        assert hasattr(bilinear_gen_payload, 'main')
+        assert hasattr(bilinear_gen_payload, "main")
 
     @classmethod
     def teardown_class(cls):

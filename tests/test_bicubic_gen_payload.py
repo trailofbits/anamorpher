@@ -17,20 +17,20 @@ class TestBicubicGenPayload:
 
     def test_module_imports(self):
         """Test that all required functions are importable"""
-        assert hasattr(bicubic_gen_payload, 'srgb2lin')
-        assert hasattr(bicubic_gen_payload, 'lin2srgb')
-        assert hasattr(bicubic_gen_payload, 'cubic_kernel')
-        assert hasattr(bicubic_gen_payload, 'weight_vector')
-        assert hasattr(bicubic_gen_payload, 'luma_linear')
-        assert hasattr(bicubic_gen_payload, 'bottom_luma_mask')
-        assert hasattr(bicubic_gen_payload, 'embed')
-        assert hasattr(bicubic_gen_payload, 'mse_psnr')
-        assert hasattr(bicubic_gen_payload, 'main')
+        assert hasattr(bicubic_gen_payload, "srgb2lin")
+        assert hasattr(bicubic_gen_payload, "lin2srgb")
+        assert hasattr(bicubic_gen_payload, "cubic_kernel")
+        assert hasattr(bicubic_gen_payload, "weight_vector")
+        assert hasattr(bicubic_gen_payload, "luma_linear")
+        assert hasattr(bicubic_gen_payload, "bottom_luma_mask")
+        assert hasattr(bicubic_gen_payload, "embed")
+        assert hasattr(bicubic_gen_payload, "mse_psnr")
+        assert hasattr(bicubic_gen_payload, "main")
 
     def test_srgb2lin_conversion(self):
         """Test sRGB to linear conversion"""
         # Test with known values
-        srgb_values = np.array([[[0., 128., 255.]]], dtype=np.float32)
+        srgb_values = np.array([[[0.0, 128.0, 255.0]]], dtype=np.float32)
         linear = bicubic_gen_payload.srgb2lin(srgb_values)
 
         assert linear.shape == srgb_values.shape
@@ -43,7 +43,7 @@ class TestBicubicGenPayload:
 
     def test_lin2srgb_conversion(self):
         """Test linear to sRGB conversion"""
-        linear_values = np.array([[[0., 0.5, 1.]]], dtype=np.float32)
+        linear_values = np.array([[[0.0, 0.5, 1.0]]], dtype=np.float32)
         srgb = bicubic_gen_payload.lin2srgb(linear_values)
 
         assert srgb.shape == linear_values.shape
@@ -56,7 +56,7 @@ class TestBicubicGenPayload:
 
     def test_roundtrip_conversion(self):
         """Test that sRGB -> linear -> sRGB is approximately identity"""
-        srgb_values = np.array([[[64., 128., 192.]]], dtype=np.float32)
+        srgb_values = np.array([[[64.0, 128.0, 192.0]]], dtype=np.float32)
         linear = bicubic_gen_payload.srgb2lin(srgb_values)
         srgb_back = bicubic_gen_payload.lin2srgb(linear)
 
@@ -66,7 +66,7 @@ class TestBicubicGenPayload:
     def test_cubic_kernel(self):
         """Test cubic kernel function"""
         # Test at known points
-        x = np.array([0., 0.5, 1., 1.5, 2.])
+        x = np.array([0.0, 0.5, 1.0, 1.5, 2.0])
         weights = bicubic_gen_payload.cubic_kernel(x)
 
         assert len(weights) == len(x)
@@ -97,8 +97,8 @@ class TestBicubicGenPayload:
         """Test bottom luma mask generation"""
         # Create test image with varying brightness
         rgb_img = np.zeros((4, 4, 3), dtype=np.float32)
-        rgb_img[0, 0] = [1., 1., 1.]  # Bright pixel
-        rgb_img[3, 3] = [0., 0., 0.]  # Dark pixel
+        rgb_img[0, 0] = [1.0, 1.0, 1.0]  # Bright pixel
+        rgb_img[3, 3] = [0.0, 0.0, 0.0]  # Dark pixel
 
         mask = bicubic_gen_payload.bottom_luma_mask(rgb_img, frac=0.5)
 
@@ -129,19 +129,19 @@ class TestBicubicGenPayload:
         mse, psnr = bicubic_gen_payload.mse_psnr(a, b)
 
         assert mse == 0.0  # Identical images should have 0 MSE
-        assert psnr == float('inf')  # And infinite PSNR
+        assert psnr == float("inf")  # And infinite PSNR
 
         # Test with different images
         b = np.ones((4, 4, 3), dtype=np.float32) * 0.6
         mse, psnr = bicubic_gen_payload.mse_psnr(a, b)
 
         assert mse > 0  # Different images should have positive MSE
-        assert psnr > 0 and psnr != float('inf')  # Finite positive PSNR
+        assert psnr > 0 and psnr != float("inf")  # Finite positive PSNR
 
     def test_main_function_args(self):
         """Test that main function accepts expected arguments"""
-        with patch('sys.argv', ['bicubic_gen_payload.py', '--help']):
-            with patch('argparse.ArgumentParser.parse_args') as mock_args:
+        with patch("sys.argv", ["bicubic_gen_payload.py", "--help"]):
+            with patch("argparse.ArgumentParser.parse_args") as mock_args:
                 mock_args.side_effect = SystemExit  # argparse exits on --help
 
                 with pytest.raises(SystemExit):
@@ -158,10 +158,11 @@ class TestBicubicGenPayload:
         mock_args.gamma = 1.0
         mock_args.dark_frac = 0.3
 
-        with patch('argparse.ArgumentParser.parse_args', return_value=mock_args), \
-             patch('PIL.Image.open') as mock_open, \
-             patch('PIL.Image.fromarray') as mock_fromarray:
-
+        with (
+            patch("argparse.ArgumentParser.parse_args", return_value=mock_args),
+            patch("PIL.Image.open") as mock_open,
+            patch("PIL.Image.fromarray") as mock_fromarray,
+        ):
             # Mock image loading
             mock_img = MagicMock()
             mock_img.convert.return_value = mock_img
@@ -170,8 +171,7 @@ class TestBicubicGenPayload:
 
             # Mock numpy array conversion
             test_array = np.random.rand(8, 8, 3).astype(np.float32)
-            with patch('numpy.asarray', return_value=test_array):
-
+            with patch("numpy.asarray", return_value=test_array):
                 mock_result_img = MagicMock()
                 mock_fromarray.return_value = mock_result_img
 

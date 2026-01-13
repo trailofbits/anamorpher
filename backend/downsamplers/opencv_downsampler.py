@@ -9,9 +9,9 @@ class OpenCVDownsampler(BaseDownsampler):
 
     def __init__(self):
         self._method_map = {
-            'nearest': cv2.INTER_NEAREST,
-            'bilinear': cv2.INTER_LINEAR,
-            'bicubic': cv2.INTER_CUBIC
+            "nearest": cv2.INTER_NEAREST,
+            "bilinear": cv2.INTER_LINEAR,
+            "bicubic": cv2.INTER_CUBIC,
         }
 
     @property
@@ -24,7 +24,7 @@ class OpenCVDownsampler(BaseDownsampler):
     def downsample(self, image: np.ndarray, target_size: tuple, method: str) -> np.ndarray:
         """
         Downsample using OpenCV resize
-        
+
         Args:
             image: Input image (H, W, C)
             target_size: (width, height)
