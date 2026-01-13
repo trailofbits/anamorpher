@@ -26,33 +26,22 @@ Anamorpher is in active beta development. We welcome feedback and contributions!
 
 ## Requirements
 
-- Python 3.9, 3.10, 3.11, 3.12, or 3.13
-- Virtual environment recommended
+- **Python 3.11+**
+- [uv](https://docs.astral.sh/uv/) (recommended) or pip
 
 ## Setup
 
-1. Create and activate virtual environment:
+1. Install dependencies:
 ```bash
-python3.11 -m venv venv
-source venv/bin/activate
+uv sync
 ```
 
-2. Install dependencies:
+2. Run backend:
 ```bash
-pip install -r requirements.txt
+uv run python backend/app.py
 ```
 
-3. Run backend:
-```bash
-cd backend
-python3 app.py
-```
-
-4. Open frontend:
-```bash
-cd frontend  # Open frontend/index.html in web browser
-```
-This project can also be run with `uv`.
+3. Open `frontend/index.html` in a web browser
 
 > Windows: Use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) due to TensorFlow dependencies.
 

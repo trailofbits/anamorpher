@@ -51,6 +51,9 @@ dmypy.json
 # Ruff
 .ruff_cache/
 
+# ty
+.ty/
+
 # Environment variables
 .env
 .env.local
@@ -66,4 +69,3 @@ backend/adversarial_generators/decoy_images/*
 
 # UV
 .uv/
-uv.lock

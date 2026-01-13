@@ -3,7 +3,7 @@ name = "anamorpher"
 version = "0.1.0"
 description = "Image scaling and adversarial generation tool"
 readme = "README.md"
-requires-python = ">=3.9"
+requires-python = ">=3.11"
 dependencies = [
     "Flask>=3.0.0,<4.0.0",
     "Flask-CORS>=4.0.0,<5.0.0",
@@ -12,7 +12,7 @@ dependencies = [
     "torchvision>=0.15.0",
     "tensorflow>=2.15.0",
     "Pillow>=10.0.0",
-    "numpy>=1.24.0,<3.0.0",
+    "numpy>=1.24.0,<2.0.0",
     "bleach>=6.0.0,<7.0.0",
     "MarkupSafe>=2.1.0,<3.0.0",
 ]
@@ -26,7 +26,26 @@ packages = ["backend"]
 
 [tool.uv]
 dev-dependencies = [
-    "pytest>=7.0.0",
-    "toml>=0.10.2",
-    "ruff>=0.1.0",
+    "pytest>=8.0.0",
+    "ruff>=0.14.0",
+    "ty>=0.0.11",
+    "pre-commit>=4.0.0",
+]
+
+[tool.ruff]
+line-length = 100
+target-version = "py311"
+
+[tool.ruff.lint]
+select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+
+[tool.pytest.ini_options]
+testpaths = ["tests"]
+python_files = ["test_*.py"]
+python_classes = ["Test*"]
+python_functions = ["test_*"]
+addopts = "-v --tb=short --strict-markers"
+markers = [
+    "slow: marks tests as slow (deselect with '-m \"not slow\"')",
+    "integration: marks tests as integration tests",
 ]
