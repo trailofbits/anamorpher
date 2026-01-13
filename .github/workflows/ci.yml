@@ -63,4 +63,4 @@ jobs:
 
       - name: Run type checker
         run: uv run ty check
-        continue-on-error: true
+        continue-on-error: true  # 7 real issues remain in backend, fix incrementally

@@ -51,6 +51,9 @@ ignore = [
     "SIM117", # nested with (stylistic)
 ]
 
+[tool.ty.src]
+exclude = ["tests/"]  # Exclude tests (sys.path manipulation, mock patterns)
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
