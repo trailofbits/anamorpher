@@ -43,11 +43,9 @@ jobs:
 
       - name: Check formatting
         run: uv run ruff format --check .
-        continue-on-error: true
 
       - name: Run linter
         run: uv run ruff check .
-        continue-on-error: true
 
   typecheck:
     runs-on: ubuntu-latest

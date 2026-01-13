@@ -15,6 +15,7 @@ VecF32 = npt.NDArray[np.float32]
 # ---------------------------------------------------------------------------
 # Color transforms
 
+
 def srgb2lin(x: ImageF32) -> ImageF32:
     """
     Convert sRGB (0..255) to linear-light (~0..1), elementwise.
@@ -29,6 +30,7 @@ def srgb2lin(x: ImageF32) -> ImageF32:
     y = np.where(x <= 0.04045, x / 12.92, ((x + 0.055) / 1.055) ** 2.4)
     return y.astype(np.float32)
 
+
 def lin2srgb(y: ImageF32) -> ImageF32:
     """
     Convert linear-light (~0..1) to sRGB (0..255), elementwise.
@@ -42,8 +44,10 @@ def lin2srgb(y: ImageF32) -> ImageF32:
     x = np.where(y <= 0.0031308, 12.92 * y, 1.055 * np.power(y, 1 / 2.4) - 0.055)
     return (x * 255.0).clip(0, 255).astype(np.float32)
 
+
 # ---------------------------------------------------------------------------
 # Core
+
 
 def embed_nn(
     decoy: ImageF32,
@@ -84,19 +88,20 @@ def embed_nn(
 
     # Null space for constraints [e_k ; ones], so we can add dither that keeps
     # both the chosen pixel and the block mean unchanged.
-    e = np.zeros(n, dtype=np.float32); e[k] = 1.0
+    e = np.zeros(n, dtype=np.float32)
+    e[k] = 1.0
     C = np.vstack([e, np.ones(n, dtype=np.float32)])  # (2,16)
     _, _, Vh = np.linalg.svd(C, full_matrices=True)
     B = Vh[2:].astype(np.float32)  # (14,16), basis for null space
 
     adv = decoy.copy()
-    tgt = (target ** gamma_target).astype(np.float32)
+    tgt = (target**gamma_target).astype(np.float32)
 
     H_t, W_t, _ = tgt.shape
     for j in range(H_t):
         for i in range(W_t):
             y0, x0 = j * s, i * s
-            blk = adv[y0:y0 + s, x0:x0 + s]
+            blk = adv[y0 : y0 + s, x0 : x0 + s]
 
             for c in (0,):  # v1: channel 0 only
                 cur = float(blk[offset, offset, c])
@@ -111,8 +116,8 @@ def embed_nn(
                     # yields:
                     #   δ_k = diff
                     #   δ_j (j!=k) = -diff * λ^2 / (1 + 15 λ^2)
-                    denom = (1.0 + 15.0 * (lam ** 2))
-                    delta_other = -diff * (lam ** 2) / denom
+                    denom = 1.0 + 15.0 * (lam**2)
+                    delta_other = -diff * (lam**2) / denom
                     blk[..., c] = blk[..., c] + delta_other
                     # Fix center to hit target exactly after the uniform shift:
                     # (because we just added delta_other to all 16 entries)
@@ -123,12 +128,14 @@ def embed_nn(
                     z = (B.T @ np.random.randn(B.shape[0]).astype(np.float32)).reshape(s, s)
                     blk[..., c] = blk[..., c] + eps * z
 
-            adv[y0:y0 + s, x0:x0 + s] = blk
+            adv[y0 : y0 + s, x0 : x0 + s] = blk
 
     return adv.astype(np.float32)
 
+
 # ---------------------------------------------------------------------------
 # Metrics
+
 
 def mse_psnr(a: ImageF32, b: ImageF32) -> tuple[float, float]:
     """
@@ -138,8 +145,10 @@ def mse_psnr(a: ImageF32, b: ImageF32) -> tuple[float, float]:
     psnr = float("inf") if mse == 0 else 10.0 * log10(1.0 / mse)
     return mse, psnr
 
+
 # ---------------------------------------------------------------------------
 # CLI
+
 
 def main() -> None:
     """
@@ -170,8 +179,9 @@ def main() -> None:
     # Basic shape check: decoy must be 4× the target resolution
     Ht, Wt = target_srgb.shape[:2]
     Hd, Wd = decoy_srgb.shape[:2]
-    assert Hd == 4 * Ht and Wd == 4 * Wt, \
+    assert Hd == 4 * Ht and Wd == 4 * Wt, (
         f"decoy must be 4× target size (got decoy {Wd}×{Hd}, target {Wt}×{Ht})"
+    )
 
     decoy_lin = srgb2lin(decoy_srgb)
     target_lin = srgb2lin(target_srgb)
@@ -196,7 +206,9 @@ def main() -> None:
     except AttributeError:
         Resampling = Image  # fallback for older Pillow
 
-    down_img = adv_img.resize((target_srgb.shape[1], target_srgb.shape[0]), resample=Resampling.NEAREST)
+    down_img = adv_img.resize(
+        (target_srgb.shape[1], target_srgb.shape[0]), resample=Resampling.NEAREST
+    )
     down_img.save(f"{name_stub}_down.png")
     print(f"✓ saved {name_stub}_down.png")
 
@@ -205,6 +217,7 @@ def main() -> None:
         srgb2lin(np.asarray(down_img, dtype=np.float32)),
     )
     print(f"4×→1× nearest  |  MSE {mse:.6f}   PSNR {psnr:.2f} dB")
+
 
 if __name__ == "__main__":
     main()

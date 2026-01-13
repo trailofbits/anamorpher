@@ -38,6 +38,18 @@ target-version = "py311"
 
 [tool.ruff.lint]
 select = ["E", "F", "W", "I", "UP", "B", "SIM"]
+ignore = [
+    "E501",   # line too long (1 remaining, fix later)
+    "SIM108", # ternary operator suggestion (stylistic)
+]
+
+[tool.ruff.lint.per-file-ignores]
+"tests/*" = [
+    "F401",   # unused imports (intentional import tests)
+    "B011",   # assert False (valid in tests)
+    "E402",   # import not at top (sys.path needed)
+    "SIM117", # nested with (stylistic)
+]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]

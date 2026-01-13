@@ -16,14 +16,17 @@ def srgb2lin(x: ImageF32) -> ImageF32:
     y = np.where(x <= 0.04045, x / 12.92, ((x + 0.055) / 1.055) ** 2.4)
     return y.astype(np.float32)
 
+
 def lin2srgb(y: ImageF32) -> ImageF32:
     x = np.where(y <= 0.0031308, 12.92 * y, 1.055 * np.power(y, 1 / 2.4) - 0.055)
     return (x * 255.0).clip(0, 255).astype(np.float32)
+
 
 def bilinear_kernel(x: npt.NDArray[np.floating]) -> npt.NDArray[np.floating]:
     """Linear (triangle) kernel for bilinear interpolation"""
     ax = np.abs(x)
     return np.where(ax <= 1, 1 - ax, 0.0)
+
 
 def weight_vector_bilinear(scale: int = 4) -> VecF32:
     """
@@ -54,18 +57,17 @@ def weight_vector_bilinear(scale: int = 4) -> VecF32:
     weights = weights / weights.sum()
     return weights.astype(np.float32).reshape(-1)
 
+
 # ---------- luma helpers ----------
+
 
 def luma_linear(img: ImageF32) -> npt.NDArray[np.float32]:
     """
     Rec.709 luma in linear-light: Y = 0.2126 R + 0.7152 G + 0.0722 B
     Returns (H, W) float32.
     """
-    return (
-        0.2126 * img[..., 0]
-        + 0.7152 * img[..., 1]
-        + 0.0722 * img[..., 2]
-    ).astype(np.float32)
+    return (0.2126 * img[..., 0] + 0.7152 * img[..., 1] + 0.0722 * img[..., 2]).astype(np.float32)
+
 
 def bottom_luma_mask(img: ImageF32, frac: float = 0.3) -> npt.NDArray[np.bool_]:
     """
@@ -76,7 +78,8 @@ def bottom_luma_mask(img: ImageF32, frac: float = 0.3) -> npt.NDArray[np.bool_]:
     y_min = float(Y.min())
     y_max = float(Y.max())
     thresh = y_min + frac * (y_max - y_min)
-    return (thresh >= Y)
+    return thresh >= Y
+
 
 def embed_bilinear(
     decoy: ImageF32,
@@ -93,20 +96,19 @@ def embed_bilinear(
     """
     s = 4
     w_full: VecF32 = weight_vector_bilinear(s)
-    sum_w_full = float(w_full.sum())
 
     # Precompute where edits are allowed based on original decoy luma
     editable_mask = bottom_luma_mask(decoy, frac=dark_frac)
 
     adv = decoy.copy()
-    tgt = (target ** gamma_target).astype(np.float32)
+    tgt = (target**gamma_target).astype(np.float32)
 
     H_t, W_t, _ = tgt.shape
     for j in range(H_t):
         for i in range(W_t):
             y0, x0 = j * s, i * s
-            blk = adv[y0:y0 + s, x0:x0 + s]
-            blk_mask = editable_mask[y0:y0 + s, x0:x0 + s]
+            blk = adv[y0 : y0 + s, x0 : x0 + s]
+            blk_mask = editable_mask[y0 : y0 + s, x0 : x0 + s]
 
             # Flatten once for convenience
             mask_flat = blk_mask.reshape(-1)
@@ -128,7 +130,7 @@ def embed_bilinear(
                 w_norm2_sub = float(w_sub @ w_sub)
 
                 # Denominator for the least-squares-with-mean term (subset version)
-                denom = (M * w_norm2_sub + lam**2) - (sum_w_sub ** 2)
+                denom = (M * w_norm2_sub + lam**2) - (sum_w_sub**2)
                 if abs(denom) < 1e-12:
                     continue  # ill-conditioned; skip this block
 
@@ -140,21 +142,25 @@ def embed_bilinear(
                     _, _, Vh_sub = np.linalg.svd(C_sub, full_matrices=True)
                     B_sub = Vh_sub[2:].astype(np.float32)
                     if B_sub.size > 0:
-                        delta_sub = delta_sub + eps * (B_sub.T @ np.random.randn(B_sub.shape[0])).astype(np.float32)
+                        delta_sub = delta_sub + eps * (
+                            B_sub.T @ np.random.randn(B_sub.shape[0])
+                        ).astype(np.float32)
 
                 # Scatter the subset update back into the 4x4 block
                 delta_vec = np.zeros_like(w_full, dtype=np.float32)
                 delta_vec[idx] = delta_sub.astype(np.float32)
                 blk[..., c] = blk[..., c] + delta_vec.reshape(s, s)
 
-            adv[y0:y0 + s, x0:x0 + s] = blk
+            adv[y0 : y0 + s, x0 : x0 + s] = blk
 
     return adv.astype(np.float32)
+
 
 def mse_psnr(a: ImageF32, b: ImageF32) -> tuple[float, float]:
     mse = float(np.mean((a - b) ** 2))
     psnr = float("inf") if mse == 0 else 10.0 * log10(1.0 / mse)
     return mse, psnr
+
 
 def main() -> None:
     ap = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
@@ -163,10 +169,17 @@ def main() -> None:
     ap.add_argument("--lam", type=float, default=0.25, help="mean-preservation weight")
     ap.add_argument("--eps", type=float, default=0.0, help="null-space dither")
     ap.add_argument("--gamma", type=float, default=1.0, help="target gamma pre-emphasis")
-    ap.add_argument("--dark-frac", type=float, default=0.3,
-                    help="fraction of luma range considered embeddable (bottom part)")
-    ap.add_argument("--anti-alias", action="store_true",
-                    help="use anti-aliased bilinear (INTER_LINEAR) instead of INTER_LINEAR_EXACT")
+    ap.add_argument(
+        "--dark-frac",
+        type=float,
+        default=0.3,
+        help="fraction of luma range considered embeddable (bottom part)",
+    )
+    ap.add_argument(
+        "--anti-alias",
+        action="store_true",
+        help="use anti-aliased bilinear (INTER_LINEAR) instead of INTER_LINEAR_EXACT",
+    )
     args = ap.parse_args()
 
     # Load images using OpenCV (loads as BGR)
@@ -207,9 +220,7 @@ def main() -> None:
 
     # Downsample using OpenCV bilinear for verification
     downsampled_bgr = cv2.resize(
-        adv_bgr,
-        (target_srgb.shape[1], target_srgb.shape[0]),
-        interpolation=interp_method
+        adv_bgr, (target_srgb.shape[1], target_srgb.shape[0]), interpolation=interp_method
     )
 
     # Convert back to RGB and linear space for comparison
@@ -218,6 +229,7 @@ def main() -> None:
 
     mse, psnr = mse_psnr(target_lin, downsampled_lin)
     print(f"4×→1× OpenCV {interp_name}  |  MSE {mse:.6f}   PSNR {psnr:.2f} dB")
+
 
 if __name__ == "__main__":
     main()

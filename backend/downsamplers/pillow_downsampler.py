@@ -9,9 +9,9 @@ class PillowDownsampler(BaseDownsampler):
 
     def __init__(self):
         self._method_map = {
-            'nearest': Image.Resampling.NEAREST,
-            'bilinear': Image.Resampling.BILINEAR,
-            'bicubic': Image.Resampling.BICUBIC
+            "nearest": Image.Resampling.NEAREST,
+            "bilinear": Image.Resampling.BILINEAR,
+            "bicubic": Image.Resampling.BICUBIC,
         }
 
     @property
@@ -24,7 +24,7 @@ class PillowDownsampler(BaseDownsampler):
     def downsample(self, image: np.ndarray, target_size: tuple, method: str) -> np.ndarray:
         """
         Downsample using Pillow resize
-        
+
         Args:
             image: Input image (H, W, C)
             target_size: (width, height)

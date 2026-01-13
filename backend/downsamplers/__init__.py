@@ -5,9 +5,9 @@ from .pytorch_downsampler import PyTorchDownsampler
 from .tensorflow_downsampler import TensorFlowDownsampler
 
 __all__ = [
-    'BaseDownsampler',
-    'OpenCVDownsampler',
-    'PyTorchDownsampler',
-    'TensorFlowDownsampler',
-    'PillowDownsampler'
+    "BaseDownsampler",
+    "OpenCVDownsampler",
+    "PyTorchDownsampler",
+    "TensorFlowDownsampler",
+    "PillowDownsampler",
 ]

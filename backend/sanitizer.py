@@ -12,6 +12,7 @@ MAX_TEXT_LENGTH = 1000
 MAX_FILENAME_LENGTH = 255
 MAX_ALIGNMENT_LENGTH = 20
 
+
 def sanitize_text(text: str, max_length: int = MAX_TEXT_LENGTH) -> str:
     """
     Sanitize text input by removing/escaping dangerous characters
@@ -31,7 +32,7 @@ def sanitize_text(text: str, max_length: int = MAX_TEXT_LENGTH) -> str:
         raise ValueError(f"Text too long. Maximum {max_length} characters allowed.")
 
     # Remove null bytes and control characters except common whitespace
-    text = ''.join(c for c in text if ord(c) >= 32 or c in '\t\n\r')
+    text = "".join(c for c in text if ord(c) >= 32 or c in "\t\n\r")
 
     # Use bleach to clean HTML/XSS
     text = bleach.clean(text, tags=[], attributes={}, strip=True)
@@ -39,9 +40,10 @@ def sanitize_text(text: str, max_length: int = MAX_TEXT_LENGTH) -> str:
     # Further restrict to safe characters only
     if not ALLOWED_TEXT_CHARS.match(text):
         # Remove any remaining dangerous characters
-        text = re.sub(r'[^\w\s.,!?;:()"\'-]', '', text)
+        text = re.sub(r'[^\w\s.,!?;:()"\'-]', "", text)
 
     return text.strip()
+
 
 def sanitize_filename(filename: str) -> str:
     """
@@ -60,25 +62,26 @@ def sanitize_filename(filename: str) -> str:
         raise ValueError(f"Filename too long. Maximum {MAX_FILENAME_LENGTH} characters allowed.")
 
     # Remove null bytes
-    filename = filename.replace('\x00', '')
+    filename = filename.replace("\x00", "")
 
     # Get just the basename to prevent directory traversal
     filename = os.path.basename(filename)
 
     # Remove potentially dangerous characters
-    filename = re.sub(r'[<>:"|?*\\]', '', filename)
+    filename = re.sub(r'[<>:"|?*\\]', "", filename)
 
     # Ensure it doesn't start with . or -
-    filename = filename.lstrip('.-')
+    filename = filename.lstrip(".-")
 
-    if not filename or filename in ['', '.', '..']:
+    if not filename or filename in ["", ".", ".."]:
         raise ValueError("Invalid filename")
 
     # Must be alphanumeric with limited special chars
-    if not re.match(r'^[a-zA-Z0-9_.-]+$', filename):
+    if not re.match(r"^[a-zA-Z0-9_.-]+$", filename):
         raise ValueError("Filename contains invalid characters")
 
     return filename
+
 
 def sanitize_alignment(alignment: str) -> str:
     """
@@ -98,8 +101,15 @@ def sanitize_alignment(alignment: str) -> str:
 
     # Whitelist valid alignments
     valid_alignments = {
-        'center', 'top', 'bottom', 'left', 'right',
-        'top-left', 'top-right', 'bottom-left', 'bottom-right'
+        "center",
+        "top",
+        "bottom",
+        "left",
+        "right",
+        "top-left",
+        "top-right",
+        "bottom-left",
+        "bottom-right",
     }
 
     alignment = alignment.strip().lower()
@@ -109,16 +119,19 @@ def sanitize_alignment(alignment: str) -> str:
 
     return alignment
 
-def sanitize_numeric(value: str | int | float,
-                    min_val: float | None = None,
-                    max_val: float | None = None,
-                    data_type: type = float) -> int | float:
+
+def sanitize_numeric(
+    value: str | int | float,
+    min_val: float | None = None,
+    max_val: float | None = None,
+    data_type: type = float,
+) -> int | float:
     """
     Sanitize numeric input
     Args:
         value: Input value to sanitize
         min_val: Minimum allowed value
-        max_val: Maximum allowed value  
+        max_val: Maximum allowed value
         data_type: Target data type (int or float)
     Returns:
         Sanitized numeric value
@@ -130,7 +143,7 @@ def sanitize_numeric(value: str | int | float,
             value = value.strip()
 
         # Convert to target type
-        if data_type == int:
+        if data_type is int:
             result = int(float(value))  # Convert via float to handle "1.0" strings
         else:
             result = float(value)
@@ -147,6 +160,7 @@ def sanitize_numeric(value: str | int | float,
     except (ValueError, TypeError) as e:
         raise ValueError(f"Invalid numeric value: {value}") from e
 
+
 def sanitize_method(method: str) -> str:
     """
     Sanitize method parameter
@@ -161,7 +175,7 @@ def sanitize_method(method: str) -> str:
         raise ValueError("Method must be a string")
 
     # Whitelist valid methods
-    valid_methods = {'bicubic', 'bilinear', 'nearest'}
+    valid_methods = {"bicubic", "bilinear", "nearest"}
 
     method = method.strip().lower()
 
@@ -169,6 +183,7 @@ def sanitize_method(method: str) -> str:
         raise ValueError(f"Invalid method: {method}")
 
     return method
+
 
 def escape_for_html(text: str) -> str:
     """
@@ -179,6 +194,7 @@ def escape_for_html(text: str) -> str:
         HTML-escaped text
     """
     return escape(text)
+
 
 def validate_safe_path(file_path: str, allowed_base_dir: str) -> str:
     """
@@ -206,18 +222,18 @@ def validate_safe_path(file_path: str, allowed_base_dir: str) -> str:
         real_file_path = os.path.realpath(abs_file_path)
         real_base_dir = os.path.realpath(abs_base_dir)
     except OSError:
-        raise ValueError("Invalid path")
+        raise ValueError("Invalid path") from None
 
     # Check if the real file path is within the real base directory
     if not real_file_path.startswith(real_base_dir + os.sep):
         raise ValueError("Path outside allowed directory")
 
     # Additional checks
-    if '..' in file_path:
+    if ".." in file_path:
         raise ValueError("Path traversal not allowed")
 
     # Check for null bytes
-    if '\x00' in file_path:
+    if "\x00" in file_path:
         raise ValueError("Null bytes not allowed in path")
 
     # Check if it's actually a file (not a directory or special file)
