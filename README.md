@@ -34,7 +34,7 @@ Anamorpher is in active beta development. We welcome feedback and contributions!
 1. Create and activate virtual environment:
 ```bash
 python3.11 -m venv venv
-source venv/bin/activate  # On Windows: venv\Scripts\activate
+source venv/bin/activate
 ```
 
 2. Install dependencies:
@@ -53,6 +53,8 @@ python3 app.py
 cd frontend  # Open frontend/index.html in web browser
 ```
 This project can also be run with `uv`.
+
+> Windows: Use [WSL2](https://learn.microsoft.com/en-us/windows/wsl/install) due to TensorFlow dependencies.
 
 ## Warnings and Known Limitations
 
