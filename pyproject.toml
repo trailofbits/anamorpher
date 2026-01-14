@@ -12,7 +12,7 @@ dependencies = [
     "torchvision>=0.15.0",
     "tensorflow>=2.15.0",
     "Pillow>=10.0.0",
-    "numpy>=1.24.0,<2.0.0",
+    "numpy>=1.24.0,<3.0.0",
     "bleach>=6.0.0,<7.0.0",
     "MarkupSafe>=2.1.0,<3.0.0",
 ]
