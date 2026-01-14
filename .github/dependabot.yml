@@ -15,6 +15,10 @@ updates:
       - "python"
     cooldown:
       default-days: 7
+    ignore:
+      # NumPy 2.x breaks TensorFlow and OpenCV - see CONTRIBUTING.md
+      - dependency-name: numpy
+        versions: [">=2.0.0"]
 
   # GitHub Actions
   - package-ecosystem: "github-actions"
