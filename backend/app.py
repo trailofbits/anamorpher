@@ -208,7 +208,11 @@ def downsample_image():
 def create_text_image(
     text: str, size: int = 1092, font_size: int = 32, alignment: str = "center"
 ) -> tuple[np.ndarray, bool]:
-    """Create a square text image with specified text, font size, and alignment. Returns tuple (image, text_overflowed)"""
+    """Create a square text image with specified text, font size, and alignment.
+
+    Returns:
+        Tuple of (image array, text_overflowed flag).
+    """
     # Create image with 1:1 aspect ratio
     image = Image.new("RGB", (size, size), color="#333333")
     draw = ImageDraw.Draw(image)

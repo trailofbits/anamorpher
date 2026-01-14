@@ -201,13 +201,9 @@ def main() -> None:
     print(f"✓ saved {name_stub}.png")
 
     # Verify with PIL's NEAREST (uses the center pixel for 4:1)
-    try:
-        Resampling = Image.Resampling  # Pillow ≥9.1
-    except AttributeError:
-        Resampling = Image  # fallback for older Pillow
-
     down_img = adv_img.resize(
-        (target_srgb.shape[1], target_srgb.shape[0]), resample=Resampling.NEAREST
+        (target_srgb.shape[1], target_srgb.shape[0]),
+        resample=Image.Resampling.NEAREST,
     )
     down_img.save(f"{name_stub}_down.png")
     print(f"✓ saved {name_stub}_down.png")

@@ -188,7 +188,7 @@ def main() -> None:
             np.asarray(
                 adv_img.resize(
                     (target_srgb.shape[1], target_srgb.shape[0]),
-                    resample=Image.BICUBIC,
+                    resample=Image.Resampling.BICUBIC,
                 ),
                 dtype=np.float32,
             )

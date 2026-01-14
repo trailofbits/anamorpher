@@ -186,9 +186,9 @@ def main() -> None:
     decoy_bgr = cv2.imread(args.decoy, cv2.IMREAD_COLOR).astype(np.float32)
     target_bgr = cv2.imread(args.target, cv2.IMREAD_COLOR).astype(np.float32)
 
-    # Convert BGR to RGB
-    decoy_srgb = cv2.cvtColor(decoy_bgr, cv2.COLOR_BGR2RGB)
-    target_srgb = cv2.cvtColor(target_bgr, cv2.COLOR_BGR2RGB)
+    # Convert BGR to RGB (astype ensures type checker knows these are float32)
+    decoy_srgb = cv2.cvtColor(decoy_bgr, cv2.COLOR_BGR2RGB).astype(np.float32)
+    target_srgb = cv2.cvtColor(target_bgr, cv2.COLOR_BGR2RGB).astype(np.float32)
 
     # Convert to linear space
     decoy_lin = srgb2lin(decoy_srgb)
