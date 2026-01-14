@@ -5,7 +5,7 @@ description = "Image scaling and adversarial generation tool"
 readme = "README.md"
 requires-python = ">=3.11"
 dependencies = [
-    "Flask>=3.0.0,<4.0.0",
+    "Flask>=3.1.0,<4.0.0",
     "Flask-CORS>=4.0.0,<5.0.0",
     "opencv-python>=4.8.0,<5.0.0",
     "torch>=2.0.0",
