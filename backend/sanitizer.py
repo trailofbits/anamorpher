@@ -1,5 +1,6 @@
 import os
 import re
+from typing import overload
 
 import bleach
 from markupsafe import escape
@@ -120,11 +121,29 @@ def sanitize_alignment(alignment: str) -> str:
     return alignment
 
 
+@overload
 def sanitize_numeric(
     value: str | int | float,
     min_val: float | None = None,
     max_val: float | None = None,
-    data_type: type = float,
+    data_type: type[int] = ...,
+) -> int: ...
+
+
+@overload
+def sanitize_numeric(
+    value: str | int | float,
+    min_val: float | None = None,
+    max_val: float | None = None,
+    data_type: type[float] = ...,
+) -> float: ...
+
+
+def sanitize_numeric(
+    value: str | int | float,
+    min_val: float | None = None,
+    max_val: float | None = None,
+    data_type: type[int] | type[float] = float,
 ) -> int | float:
     """
     Sanitize numeric input
