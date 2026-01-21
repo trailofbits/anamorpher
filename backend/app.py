@@ -1,9 +1,11 @@
 import base64
 import glob
 import io
+import logging
 import os
 import re
 import subprocess
+import sys
 import tempfile
 
 import numpy as np
@@ -18,6 +20,12 @@ from sanitizer import (
     sanitize_numeric,
     sanitize_text,
     validate_safe_path,
+)
+
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s - %(levelname)s - %(message)s",
+    stream=sys.stderr,
 )
 
 # Configuration
@@ -41,6 +49,14 @@ from downsamplers import (  # noqa: E402
 
 app = Flask(__name__)
 CORS(app)
+
+
+@app.errorhandler(Exception)
+def handle_unexpected_error(_error):
+    """Global handler for unhandled exceptions."""
+    app.logger.exception("Unhandled exception in %s %s", request.method, request.path)
+    return jsonify({"error": "An unexpected error occurred"}), 500
+
 
 # Initialize downsamplers
 downsamplers = {
@@ -202,7 +218,8 @@ def downsample_image():
     except ValueError as e:
         return jsonify({"error": escape_for_html(str(e))}), 400
     except Exception:
-        return jsonify({"error": "Internal server error"}), 500
+        app.logger.exception("Error in downsample_image")
+        return jsonify({"error": "Image downsampling failed"}), 500
 
 
 def create_text_image(
@@ -379,6 +396,16 @@ def get_decoy_images():
     return decoys
 
 
+def parse_script_error(stderr: str, method: str) -> str:
+    """Extract user-friendly message from script stderr."""
+    stderr_lower = stderr.lower()
+    if "4x target size" in stderr_lower or "4× target" in stderr_lower:
+        return "Decoy image must be exactly 4x the target resolution"
+    if "failed to read" in stderr_lower or "cannot identify image" in stderr_lower:
+        return "Failed to read image file"
+    return f"Image generation failed ({method} method)"
+
+
 @app.route("/api/decoy-images", methods=["GET"])
 def get_available_decoy_images():
     """Get available decoy images"""
@@ -504,7 +531,8 @@ def generate_text_image():
     except ValueError as e:
         return jsonify({"error": escape_for_html(str(e))}), 400
     except Exception:
-        return jsonify({"error": "Internal server error"}), 500
+        app.logger.exception("Error in generate_text_image")
+        return jsonify({"error": "Text image generation failed"}), 500
 
 
 @app.route("/api/generate-adversarial", methods=["POST"])
@@ -550,7 +578,7 @@ def generate_adversarial():
 
         # Additional parameters for nearest neighbor
         offset = (
-            sanitize_numeric(data.get("offset", 2), min_val=0, max_val=10, data_type=int)
+            sanitize_numeric(data.get("offset", 2), min_val=0, max_val=3, data_type=int)
             if method == "nearest"
             else 2
         )
@@ -647,16 +675,16 @@ def generate_adversarial():
                 ]
 
             # Run the script in the temp directory
-            result = subprocess.run(cmd, cwd=temp_dir, capture_output=True, text=True)
+            result = subprocess.run(cmd, cwd=temp_dir, capture_output=True, text=True, timeout=120)
 
             if result.returncode != 0:
-                return jsonify(
-                    {
-                        "error": escape_for_html(
-                            f"Script execution failed: {result.stderr[:500]}"
-                        )  # Limit error length
-                    }
-                ), 500
+                app.logger.error(
+                    "Script failed (exit %d): %s\nstderr: %s",
+                    result.returncode,
+                    script_path,
+                    result.stderr,
+                )
+                return jsonify({"error": parse_script_error(result.stderr, method)}), 500
 
             # Find the generated adversarial image
             if method == "nearest":
@@ -704,7 +732,8 @@ def generate_adversarial():
     except ValueError as e:
         return jsonify({"error": escape_for_html(str(e))}), 400
     except Exception:
-        return jsonify({"error": "Internal server error"}), 500
+        app.logger.exception("Error in generate_adversarial")
+        return jsonify({"error": "Adversarial image generation failed"}), 500
 
 
 @app.route("/health", methods=["GET"])
