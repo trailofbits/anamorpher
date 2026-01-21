@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import argparse
+import sys
 from math import log10
 
 import cv2
@@ -183,8 +184,17 @@ def main() -> None:
     args = ap.parse_args()
 
     # Load images using OpenCV (loads as BGR)
-    decoy_bgr = cv2.imread(args.decoy, cv2.IMREAD_COLOR).astype(np.float32)
-    target_bgr = cv2.imread(args.target, cv2.IMREAD_COLOR).astype(np.float32)
+    decoy_bgr = cv2.imread(args.decoy, cv2.IMREAD_COLOR)
+    if decoy_bgr is None:
+        print(f"Error: Failed to read decoy image: {args.decoy}", file=sys.stderr)
+        sys.exit(1)
+    decoy_bgr = decoy_bgr.astype(np.float32)
+
+    target_bgr = cv2.imread(args.target, cv2.IMREAD_COLOR)
+    if target_bgr is None:
+        print(f"Error: Failed to read target image: {args.target}", file=sys.stderr)
+        sys.exit(1)
+    target_bgr = target_bgr.astype(np.float32)
 
     # Convert BGR to RGB (astype ensures type checker knows these are float32)
     decoy_srgb = cv2.cvtColor(decoy_bgr, cv2.COLOR_BGR2RGB).astype(np.float32)
